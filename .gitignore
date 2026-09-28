@@ -1,0 +1,9 @@
+node_modules
+
+.angular
+
+
+
+.nx/cache
+.nx/workspace-data
+.nx/migrate-runs
