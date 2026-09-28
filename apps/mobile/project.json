@@ -8,9 +8,7 @@
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/mobile",
@@ -23,9 +21,7 @@
             "input": "apps/mobile/public"
           }
         ],
-        "styles": [
-          "apps/mobile/src/styles.scss"
-        ]
+        "styles": ["apps/mobile/src/styles.scss"]
       },
       "configurations": {
         "production": {
@@ -68,9 +64,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "apps/mobile/jest.config.cts",
         "tsConfig": "apps/mobile/tsconfig.spec.json"
@@ -83,6 +77,75 @@
         "buildTarget": "mobile:build",
         "staticFilePath": "dist/apps/mobile/browser",
         "spa": true
+      }
+    },
+    "capacitor-sync": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap sync android",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "capacitor-open": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap open android",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "capacitor-run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap run android",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "android-sync": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "npx cap sync android",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "android-open": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "npx cap sync android && npx cap open android",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "android-run": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "npx cap sync android && npx cap run android",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "ios-sync": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "npx cap sync ios",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "ios-open": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "npx cap sync ios && npx cap open ios",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "ios-run": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "npx cap sync ios && npx cap run ios",
+        "cwd": "{workspaceRoot}"
       }
     }
   }
