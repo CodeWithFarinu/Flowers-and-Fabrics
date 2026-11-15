@@ -1,0 +1,83 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="glass-header">
+    <ion-title>My Account & Privileges</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-profile-padding">
+    <!-- User Identity Header -->
+    <div class="profile-card atelier-card">
+      <div class="avatar-row">
+        <div class="avatar-circle">BF</div>
+        <div>
+          <h3>{{ authStore.currentUser().name }}</h3>
+          <span>{{ authStore.currentUser().phone }}</span>
+        </div>
+        <span class="member-tag">{{ authStore.accountState() }}</span>
+      </div>
+    </div>
+
+    <!-- Loyalty Status Box -->
+    <div class="loyalty-card atelier-card">
+      <span class="card-eyebrow">PATRON STATUS</span>
+      <div class="tier-title-row">
+        <h2 class="tier-name">
+          {{ authStore.loyaltyTier() | uppercase }} TIER
+        </h2>
+        <span class="tier-badge-star">★ 12% REWARD RATE</span>
+      </div>
+
+      <div class="points-row price-display">
+        <strong>{{ authStore.loyaltyPoints().toLocaleString() }}</strong>
+        <small
+          >Teepha Points (Worth ₦{{
+            (authStore.loyaltyPoints() * 10).toLocaleString()
+          }})</small
+        >
+      </div>
+
+      <div class="bar-box">
+        <div class="bar-fill" style="width: 75%"></div>
+      </div>
+      <span class="next-hint"
+        >₦105,000 more spend to reach Teepha Sovereign Tier</span
+      >
+    </div>
+
+    <!-- Token Balance -->
+    <div class="token-box atelier-card">
+      <div class="t-left">
+        <span class="t-icon">✦</span>
+        <div>
+          <strong>{{ authStore.tokenBalance() }} AI Style Tokens</strong>
+          <small>Virtual fit simulations available</small>
+        </div>
+      </div>
+      <button type="button" class="btn-ghost" (click)="addTestToken()">
+        + Claim
+      </button>
+    </div>
+
+    <!-- Theme Switcher Row -->
+    <div class="theme-row atelier-card">
+      <div>
+        <strong>Appearance Palette</strong>
+        <small>Light, Dark, or Match System</small>
+      </div>
+      <atelier-theme-toggle />
+    </div>
+
+    <!-- Affiliate Link Row -->
+    <div class="affiliate-row atelier-card">
+      <span class="card-eyebrow">GROWTH REWARDS</span>
+      <strong>Your Affiliate Referral Link</strong>
+      <div class="aff-copy-wrap">
+        <span class="aff-url">https://teepha.com?aff=AFF-BOLU</span>
+        <button type="button" class="btn-secondary" (click)="copyAff()">
+          Copy
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,498 @@
+<section class="stories-rail-showcase">
+  <!-- Centered Guild Rails Header -->
+  <header class="stories-header">
+    <div class="kicker-pill">
+      <span class="rare-glyph">⚜</span>
+      <span>TEEPHA DISPATCHES · CURATED RUNWAY & FIT RAILS</span>
+      <span class="rare-glyph">⚜</span>
+    </div>
+    <h2 class="stories-main-title">Curated Fashion Rails & Guild Stories</h2>
+    <p class="stories-slogan">
+      "Get a worth for ur class" · High-signal runway cuts, master artisans &
+      patron fits
+    </p>
+
+    <!-- Centered Multi-Rail Navigation Switcher with Visible Counts -->
+    <nav class="rail-switcher-nav" aria-label="Stories Rails">
+      <button
+        type="button"
+        class="rail-track-pill"
+        [class.active]="activeRail() === 'runway'"
+        (click)="activeRail.set('runway')"
+      >
+        <span class="pill-glyph">⚜</span>
+        <span class="pill-label">Runway & Editorial</span>
+        <span class="pill-count-badge">5 DROPS</span>
+      </button>
+
+      <button
+        type="button"
+        class="rail-track-pill"
+        [class.active]="activeRail() === 'craftsmen'"
+        (click)="activeRail.set('craftsmen')"
+      >
+        <span class="pill-glyph">✂</span>
+        <span class="pill-label">Master Tailors</span>
+        <span class="pill-count-badge">4 GUILDS</span>
+      </button>
+
+      <button
+        type="button"
+        class="rail-track-pill"
+        [class.active]="activeRail() === 'patrons'"
+        (click)="activeRail.set('patrons')"
+      >
+        <span class="pill-glyph">❖</span>
+        <span class="pill-label">Patron Fit Gallery</span>
+        <span class="pill-count-badge"
+          >{{ approvedCommunityFits().length }} VERIFIED</span
+        >
+      </button>
+
+      <!-- Upload Fit Marketing Action Pill -->
+      <button
+        type="button"
+        class="rail-upload-trigger-btn"
+        (click)="openUploadModal()"
+      >
+        <span class="pill-glyph gold">⟡</span>
+        <span>Submit Your Fit</span>
+        <span class="pts-reward">+500 PTS</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Centered Story Medallions Track -->
+  <div class="stories-centered-container">
+    <!-- If on Patron Rail: Include the Upload First Card -->
+    @if (activeRail() === 'patrons') {
+      <button
+        type="button"
+        class="story-bubble-btn upload-bubble-btn"
+        (click)="openUploadModal()"
+      >
+        <div class="bubble-medallion upload-medallion">
+          <div class="medallion-inner upload-inner">
+            <span class="upload-plus-glyph">⟡</span>
+            <span class="upload-btn-text">UPLOAD FIT</span>
+          </div>
+        </div>
+        <span class="bubble-label">+ Submit Look</span>
+        <span class="marketing-badge-tag gold-badge">EARN ₦5,000</span>
+      </button>
+    }
+
+    <!-- Stories in Current Active Rail -->
+    @for (story of displayedStories(); track story.id; let idx = $index) {
+      <button
+        type="button"
+        class="story-bubble-btn"
+        (click)="openStory(story)"
+        [title]="story.title"
+      >
+        <!-- Luxury Heraldic Medallion with Classy Rare Icons -->
+        <div
+          class="bubble-medallion"
+          [class.unviewed]="!viewedStoryIds().has(story.id)"
+        >
+          <div class="medallion-inner">
+            <!-- Ambient Textured Background Media -->
+            <img
+              [src]="story.avatarUrl"
+              [alt]="story.title"
+              class="bubble-bg-img"
+            />
+            <div class="medallion-scrim"></div>
+
+            <!-- Rare Heraldic Icon Medallion Overlay -->
+            <div class="heraldic-icon-badge">
+              @switch (story.iconType) {
+                @case ('shears') {
+                  <!-- Tailor Shears SVG -->
+                  <svg
+                    class="medallion-svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="6" cy="6" r="3" />
+                    <circle cx="6" cy="18" r="3" />
+                    <line x1="20" y1="4" x2="8.12" y2="15.88" />
+                    <line x1="14.47" y1="14.48" x2="20" y2="20" />
+                    <line x1="8.12" y1="8.12" x2="12" y2="12" />
+                  </svg>
+                }
+                @case ('coronet') {
+                  <!-- Coronet Royal Crown -->
+                  <svg
+                    class="medallion-svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"
+                    />
+                  </svg>
+                }
+                @case ('tourbillon') {
+                  <!-- Horology Calibre Tourbillon Escapement -->
+                  <svg
+                    class="medallion-svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <polyline points="12 6 12 12 16 14" />
+                    <circle cx="12" cy="12" r="2" fill="currentColor" />
+                  </svg>
+                }
+                @case ('caduceus') {
+                  <!-- Caduceus / Runway Crest -->
+                  <svg
+                    class="medallion-svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="2" x2="12" y2="22" />
+                    <path
+                      d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                    />
+                  </svg>
+                }
+                @case ('needle') {
+                  <!-- Loom Spindle & Needle -->
+                  <svg
+                    class="medallion-svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8Z"
+                      fill="#D97706"
+                    />
+                  </svg>
+                }
+                @case ('signet') {
+                  <!-- Diamond Quad Signet -->
+                  <svg
+                    class="medallion-svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2L2 12L12 22L22 12L12 2Z" />
+                  </svg>
+                }
+                @default {
+                  <!-- Fleur-de-lis Royalty Crest -->
+                  <svg
+                    class="medallion-svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M12 2C11.5 5 9 7 9 10C9 12 10.5 13.5 12 13.5C13.5 13.5 15 12 15 10C15 7 12.5 5 12 2M6 8C5.5 10 5 11 5 12.5C5 14.5 6.5 16 8.5 16C10 16 11.2 15 11.7 13.8C10.5 13.2 9.5 12 9.2 10.5C8.2 9.5 7 8.5 6 8M18 8C17 8.5 15.8 9.5 14.8 10.5C14.5 12 13.5 13.2 12.3 13.8C12.8 15 14 16 15.5 16C17.5 16 19 14.5 19 12.5C19 11 18.5 10 18 8M7 18H17V19.5C17 20.5 16 21.5 15 21.5H9C8 21.5 7 20.5 7 19.5V18Z"
+                    />
+                  </svg>
+                }
+              }
+            </div>
+
+            @if (story.isLive) {
+              <span class="live-pill">LIVE DISPATCH</span>
+            }
+          </div>
+        </div>
+
+        <!-- Title Label -->
+        <span class="bubble-label">{{ story.title }}</span>
+
+        <!-- High-Signal Marketing Badge Pill -->
+        <span class="marketing-badge-tag">{{ story.marketingBadge }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- FULL-SCREEN LUXE INSTAGRAM/TIKTOK STORY VIEWER MODAL -->
+  <!-- ======================================================= -->
+  @if (activeStory() !== null) {
+    <div class="story-modal-overlay" (click)="closeStory()">
+      <div class="story-modal-viewport" (click)="$event.stopPropagation()">
+        <!-- Top Segment Progress Bars -->
+        <div class="story-progress-bars">
+          @for (
+            slide of activeStory()!.slides;
+            track $index;
+            let sIdx = $index
+          ) {
+            <div class="progress-bar-slot">
+              <div
+                class="progress-bar-fill"
+                [style.width]="
+                  sIdx < activeSlideIndex()
+                    ? '100%'
+                    : sIdx === activeSlideIndex()
+                      ? slideProgress() + '%'
+                      : '0%'
+                "
+              ></div>
+            </div>
+          }
+        </div>
+
+        <!-- Story Header -->
+        <div class="story-player-header">
+          <div class="author-info">
+            <div class="author-crest-mini">
+              <span class="author-glyph">⚜</span>
+            </div>
+            <div>
+              <strong class="author-name">{{ activeStory()!.author }}</strong>
+              <div class="author-sub-row">
+                <span class="story-tag">{{ activeStory()!.title }}</span>
+                <span class="dot-sep">·</span>
+                <span class="slogan-micro">"Get a worth for ur class"</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="story-close-btn" (click)="closeStory()">
+            ✕
+          </button>
+        </div>
+
+        <!-- Slide Media Layer -->
+        <div class="story-media-layer">
+          <img
+            [src]="activeStory()!.slides[activeSlideIndex()].imageUrl"
+            [alt]="activeStory()!.title"
+            class="story-slide-img"
+          />
+          <div class="story-scrim"></div>
+
+          <!-- Marketing Promo Ribbon inside Slide -->
+          <div class="story-promo-floating-tag">
+            <span class="promo-star">✦</span>
+            <span
+              >EXCLUSIVE ALLOCATION · CODE: <strong>TEEPHA10</strong> FOR 10%
+              OFF</span
+            >
+          </div>
+        </div>
+
+        <!-- Interactive Tap Navigation Zones -->
+        <div class="tap-zone left-tap" (click)="prevSlide()"></div>
+        <div class="tap-zone right-tap" (click)="nextSlide()"></div>
+
+        <!-- Story Footer & Shop CTA -->
+        <div class="story-player-footer">
+          <p class="story-caption">{{ activeStory()!.caption }}</p>
+          @if (activeStory()!.slides[activeSlideIndex()].productSlug; as slug) {
+            <button
+              type="button"
+              (click)="
+                onShopThisLook(
+                  slug,
+                  activeStory()!.slides[activeSlideIndex()].productTitle
+                )
+              "
+              class="btn-primary shop-look-btn"
+            >
+              <span class="shop-glyph">✂</span>
+              Shop This Piece (₦{{
+                activeStory()!.slides[
+                  activeSlideIndex()
+                ].price?.toLocaleString()
+              }}) →
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ======================================================= -->
+  <!-- PATRON BESPOKE FIT UPLOAD SUBMISSION MODAL -->
+  <!-- ======================================================= -->
+  @if (showUploadModal()) {
+    <div class="modal-overlay" (click)="closeUploadModal()">
+      <div
+        class="upload-modal-card atelier-card"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <span class="modal-kicker">⚜ TEEPHA GUILD COMMUNITY ⚜</span>
+            <h3 class="modal-title">Submit Your Bespoke Fit</h3>
+            <p class="modal-sub">
+              "Get a worth for ur class" · Approved looks feature on the
+              official Patron Rail and earn
+              <strong>500 Guild Points (₦5,000 value)</strong>.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="modal-close-btn"
+            (click)="closeUploadModal()"
+          >
+            ✕
+          </button>
+        </div>
+
+        @if (uploadSuccess()) {
+          <div class="upload-success-state">
+            <span class="success-seal">⚜</span>
+            <h4>Fit Submitted for Curatorial Review!</h4>
+            <p>
+              Our Master Tailor Guild will inspect your look within 24 hours.
+              Once approved, it will be published to the Patron Rail and your
+              account will receive 500 Guild Reward Points.
+            </p>
+            <button
+              type="button"
+              class="btn-primary"
+              (click)="closeUploadModal()"
+            >
+              Return to Discovery
+            </button>
+          </div>
+        } @else {
+          <form (submit)="submitFit($event)" class="fit-upload-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Patron Full Name *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="fitForm.patronName"
+                  name="patronName"
+                  placeholder="e.g. Boluwatife Adeleke"
+                  required
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Instagram / TikTok Handle *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="fitForm.handle"
+                  name="handle"
+                  placeholder="e.g. @bolu_luxe"
+                  required
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Fabric / Garment Worn *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="fitForm.fabricTitle"
+                  name="fabricTitle"
+                  placeholder="e.g. Super 160s Italian Cashmere Agbada"
+                  required
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Master Tailor / Designer & City *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="fitForm.tailorName"
+                  name="tailorName"
+                  placeholder="e.g. Tailored by Kenechukwu Bespoke, Ikoyi"
+                  required
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Occasion / Event *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="fitForm.occasion"
+                  name="occasion"
+                  placeholder="e.g. Coronation Wedding at Eko Atlantic"
+                  required
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Fit Photograph URL (High-Res) *</label>
+                <input
+                  type="url"
+                  [(ngModel)]="fitForm.imageUrl"
+                  name="imageUrl"
+                  placeholder="https://... or choose preset below"
+                  required
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <!-- Sample Photo Quick-Select -->
+            <div class="quick-photo-select">
+              <span class="quick-lbl">Or select sample haute look:</span>
+              <div class="preset-thumbs">
+                <img
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
+                  alt="Sample Agbada"
+                  (click)="
+                    fitForm.imageUrl =
+                      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
+                  "
+                  [class.selected]="
+                    fitForm.imageUrl.includes('photo-1507003211169')
+                  "
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80"
+                  alt="Sample Senator"
+                  (click)="
+                    fitForm.imageUrl =
+                      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80'
+                  "
+                  [class.selected]="
+                    fitForm.imageUrl.includes('photo-1500648767791')
+                  "
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+                  alt="Sample Swiss Voile"
+                  (click)="
+                    fitForm.imageUrl =
+                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'
+                  "
+                  [class.selected]="
+                    fitForm.imageUrl.includes('photo-1534528741775')
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="closeUploadModal()"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn-primary">
+                Submit Fit for Guild Curation (+500 Pts) →
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  }
+</section>

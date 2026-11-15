@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Flowers &amp; Fabrics</string>
+    <string name="title_activity_main">Flowers &amp; Fabrics</string>
+    <string name="package_name">com.flowersandfabrics.app</string>
+    <string name="custom_url_scheme">com.flowersandfabrics.app</string>
+</resources>

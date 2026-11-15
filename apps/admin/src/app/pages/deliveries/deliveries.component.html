@@ -1,0 +1,345 @@
+<div class="admin-page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">LOGISTICS & VAULT DISPATCH</span>
+      <h1 class="page-title">
+        Courier Fleet, Same-Day Dispatch & Delivery SLA
+      </h1>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="showAddCourierModal.set(true)"
+      >
+        + Register Fleet Courier
+      </button>
+    </div>
+  </div>
+
+  <!-- Fleet Metrics -->
+  <div class="kpi-grid">
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Active Couriers On-Duty</span>
+      <div class="kpi-val price-display">
+        {{ activeCouriersCount() }} / {{ adminStore.couriers().length }}
+      </div>
+      <span class="kpi-trend positive"
+        >Lagos Express (Ipaja Dispatch Vault)</span
+      >
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Lagos Same-Day On-Time SLA</span>
+      <div class="kpi-val price-display">98.4%</div>
+      <span class="kpi-trend positive">Orders before 1:00 PM cut-off</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Packages In Transit</span>
+      <div class="kpi-val price-display">{{ inTransitOrdersCount() }}</div>
+      <span class="kpi-trend neutral"
+        >En route across Lagos Mainland & Island</span
+      >
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Awaiting Courier Hand-off</span>
+      <div class="kpi-val price-display">{{ pendingHandOffCount() }}</div>
+      <span class="kpi-trend neutral">Vault packed & sealed</span>
+    </div>
+  </div>
+
+  <!-- Dispatch Orders Queue -->
+  <section class="section-block">
+    <div class="section-header-row">
+      <div>
+        <h2 class="section-title">Dispatch Queue & Live Order Handoff</h2>
+        <p class="section-desc">
+          Assign verified, packed luxury parcels to designated motorcycle and
+          armored vehicle couriers.
+        </p>
+      </div>
+    </div>
+
+    <div class="table-card atelier-card">
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Order Ref</th>
+              <th>Patron & Destination</th>
+              <th>Service Tier</th>
+              <th>Total Value</th>
+              <th>Current Courier</th>
+              <th>Status</th>
+              <th>Dispatch Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ord of adminStore.orders(); track ord.id) {
+              <tr>
+                <td>
+                  <strong>#{{ ord.orderNumber }}</strong>
+                  <div class="ord-time">
+                    {{ ord.createdAt | date: 'shortTime' }}
+                  </div>
+                </td>
+                <td>
+                  <div class="dest-cell">
+                    <strong>{{ ord.customerDetails.name }}</strong>
+                    <span class="dest-addr">{{
+                      ord.deliveryDetails.address
+                    }}</span>
+                    <span class="dest-zone"
+                      >{{ ord.deliveryDetails.lga }},
+                      {{ ord.deliveryDetails.state }}</span
+                    >
+                  </div>
+                </td>
+                <td>
+                  <span
+                    class="speed-badge"
+                    [class.same-day]="
+                      ord.deliveryDetails.speed === 'lagos_same_day'
+                    "
+                  >
+                    {{
+                      ord.deliveryDetails.speed === 'lagos_same_day'
+                        ? '⚡ Lagos Same-Day'
+                        : '✈ Abuja / Interstate'
+                    }}
+                  </span>
+                </td>
+                <td class="price-display font-bold">
+                  ₦{{ ord.total.toLocaleString() }}
+                </td>
+                <td>
+                  <span class="courier-name">
+                    {{ getAssignedCourierName(ord.orderNumber) }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    class="status-pill"
+                    [class.confirmed]="ord.status === 'confirmed'"
+                    [class.packed]="ord.status === 'packed'"
+                    [class.shipped]="ord.status === 'shipped'"
+                  >
+                    ● {{ ord.status | uppercase }}
+                  </span>
+                </td>
+                <td>
+                  <div class="dispatch-actions">
+                    @if (
+                      ord.status === 'confirmed' || ord.status === 'packed'
+                    ) {
+                      <select
+                        class="courier-select"
+                        (change)="onAssignCourier(ord.id, $event)"
+                      >
+                        <option value="">Assign Rider...</option>
+                        @for (c of adminStore.couriers(); track c.id) {
+                          <option [value]="c.id">
+                            {{ c.riderName }} ({{ c.currentLocationZone }})
+                          </option>
+                        }
+                      </select>
+                    } @else if (ord.status === 'shipped') {
+                      <button
+                        type="button"
+                        class="btn-primary mini-btn"
+                        (click)="markDelivered(ord.id)"
+                      >
+                        ✓ Confirm Delivery
+                      </button>
+                    } @else {
+                      <span class="delivered-text">Delivered</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Courier Fleet Roster -->
+  <section class="section-block">
+    <div class="section-header-row">
+      <div>
+        <h2 class="section-title">Fleet Logistics Roster</h2>
+        <p class="section-desc">
+          Active motorcycle dispatchers, armored VIP vans, and interstate air
+          cargo representatives.
+        </p>
+      </div>
+    </div>
+
+    <div class="couriers-grid">
+      @for (c of adminStore.couriers(); track c.id) {
+        <div class="courier-card atelier-card">
+          <div class="courier-top">
+            <div class="courier-title-wrap">
+              <div class="vehicle-icon">
+                @if (c.vehicleType === 'motorcycle_express') {
+                  🏍
+                } @else if (c.vehicleType === 'van_vip') {
+                  🚐
+                } @else {
+                  ✈
+                }
+              </div>
+              <div>
+                <h3 class="courier-name">{{ c.riderName }}</h3>
+                <span class="vehicle-desc">
+                  {{
+                    c.vehicleType === 'motorcycle_express'
+                      ? 'Motorcycle Express'
+                      : c.vehicleType === 'van_vip'
+                        ? 'Armored VIP Van'
+                        : 'Abuja Air Cargo Desk'
+                  }}
+                </span>
+              </div>
+            </div>
+
+            <span
+              class="status-dot-pill"
+              [class.available]="c.status === 'available'"
+              [class.transit]="c.status === 'in_transit'"
+              [class.off]="c.status === 'off_duty'"
+            >
+              ●
+              {{
+                c.status === 'in_transit'
+                  ? 'In Transit'
+                  : c.status === 'available'
+                    ? 'Available'
+                    : 'Off Duty'
+              }}
+            </span>
+          </div>
+
+          <div class="courier-details">
+            <div class="detail-row">
+              <span class="detail-label">Current Zone:</span>
+              <strong class="detail-val">{{ c.currentLocationZone }}</strong>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Active Parcels:</span>
+              <strong class="detail-val"
+                >{{ c.activeDeliveriesCount }} assigned</strong
+              >
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Courier Rating:</span>
+              <strong class="detail-val">★ {{ c.rating }} / 5.0</strong>
+            </div>
+          </div>
+
+          <div class="courier-actions-row">
+            <select
+              class="status-select"
+              [ngModel]="c.status"
+              (ngModelChange)="onUpdateCourierStatus(c.id, $event)"
+            >
+              <option value="available">Set: Available</option>
+              <option value="in_transit">Set: In Transit</option>
+              <option value="off_duty">Set: Off Duty</option>
+            </select>
+
+            <a
+              [href]="getDriverWhatsAppLink(c.riderPhone, c.riderName)"
+              target="_blank"
+              class="btn-ghost mini-btn wa-link"
+            >
+              WhatsApp Driver ↗
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+</div>
+
+<!-- Modal: Register Courier -->
+@if (showAddCourierModal()) {
+  <div class="modal-backdrop" (click)="showAddCourierModal.set(false)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">FLEET EXPANSION</span>
+          <h3 class="modal-title">Register Dispatch Courier</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="showAddCourierModal.set(false)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Driver / Courier Name *</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="e.g. Oluwaseun Davies"
+            [(ngModel)]="newCourierName"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone (+234 E.164) *</label>
+          <input
+            type="tel"
+            class="form-input"
+            placeholder="+23480..."
+            [(ngModel)]="newCourierPhone"
+          />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Vehicle Type</label>
+            <select class="form-select" [(ngModel)]="newCourierVehicle">
+              <option value="motorcycle_express">Motorcycle Express</option>
+              <option value="van_vip">Armored VIP Van</option>
+              <option value="abuja_air_cargo">Abuja Air Cargo Desk</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Operating Zone</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="e.g. Lekki / Victoria Island"
+              [(ngModel)]="newCourierZone"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="showAddCourierModal.set(false)"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn-primary" (click)="saveNewCourier()">
+          Register Courier
+        </button>
+      </div>
+    </div>
+  </div>
+}

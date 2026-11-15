@@ -1,0 +1,318 @@
+<div class="affiliate-container">
+  @if (authStore.isAffiliate()) {
+    <!-- ============================================== -->
+    <!-- REGISTERED AFFILIATE DASHBOARD VIEW -->
+    <!-- ============================================== -->
+    <div class="affiliate-header">
+      <div>
+        <span class="aff-eyebrow">✦ TEEPHA PARTNER GUILD · ACTIVE PARTNER</span>
+        <h1 class="aff-title">Affiliate Growth & Commission Portal</h1>
+        <p class="aff-subtitle">
+          Earn <strong>10% commission</strong> in Nigerian Naira on every
+          verified fabric cut and luxury item purchased through your tracked
+          links.
+        </p>
+      </div>
+
+      <div class="aff-code-badge atelier-card">
+        <span class="code-label">Your Unique Affiliate Tag:</span>
+        <strong class="code-val">{{ affiliateCode }}</strong>
+      </div>
+    </div>
+
+    <!-- Financial Dashboard Cards -->
+    <div class="earnings-summary-grid">
+      <div class="metric-card atelier-card">
+        <span class="metric-lbl">Total Accumulated Commission</span>
+        <span class="metric-val price-display"
+          >₦{{ totalEarnings.toLocaleString() }}</span
+        >
+        <span class="metric-note"
+          >Lifetime verified sales (18 client orders)</span
+        >
+      </div>
+
+      <div class="metric-card atelier-card">
+        <span class="metric-lbl">Available for Payout</span>
+        <span
+          class="metric-val price-display"
+          style="color: var(--status-success)"
+        >
+          ₦{{ pendingEarnings.toLocaleString() }}
+        </span>
+        <button
+          type="button"
+          class="btn-primary payout-request-btn"
+          (click)="requestPayout()"
+          [disabled]="pendingEarnings === 0 || payoutRequested()"
+        >
+          {{
+            payoutRequested()
+              ? 'Payout Processing via Wema Switch...'
+              : 'Withdraw to Bank Account →'
+          }}
+        </button>
+      </div>
+
+      <div class="metric-card atelier-card">
+        <span class="metric-lbl">Ad Clicks & Conversions</span>
+        <div class="clicks-conv-row price-display">
+          <div>
+            <strong class="sub-metric">{{
+              clicksCount.toLocaleString()
+            }}</strong>
+            <small>Link Clicks</small>
+          </div>
+          <div>
+            <strong class="sub-metric">{{ conversionsCount }}</strong>
+            <small>Paid Orders (5.4% CR)</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracked Link Generator Tool -->
+    <div class="generator-panel atelier-card">
+      <h2 class="panel-heading">Generate Tracked Product Referral Link</h2>
+      <p class="panel-desc">
+        Select any fabric, luxury sneaker, or timepiece from our catalog. We'll
+        generate a high-converting tracked short link with your affiliate tag
+        attached.
+      </p>
+
+      <div class="gen-form-row">
+        <select class="product-dropdown" [(ngModel)]="selectedProductSlug">
+          @for (p of productStore.products(); track p.id) {
+            <option [value]="p.slug">
+              {{ p.title }} (₦{{ p.price.toLocaleString() }})
+            </option>
+          }
+        </select>
+
+        <button
+          type="button"
+          class="btn-primary gen-link-btn"
+          (click)="generateLink()"
+        >
+          Generate Link ↗
+        </button>
+      </div>
+
+      @if (generatedUrl()) {
+        <div class="link-output-box">
+          <input
+            type="text"
+            class="url-input"
+            [value]="generatedUrl()"
+            readonly
+          />
+          <button
+            type="button"
+            class="btn-secondary copy-url-btn"
+            (click)="copyLink()"
+          >
+            {{ copied() ? 'Copied to Clipboard ✓' : 'Copy Tracked URL' }}
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Recent Conversions Table -->
+    <div class="table-card atelier-card">
+      <h3 class="table-heading">Recent Commission Transactions</h3>
+      <div class="table-responsive">
+        <table class="atelier-table">
+          <thead>
+            <tr>
+              <th>Order Ref</th>
+              <th>Item Referred</th>
+              <th>Order Value</th>
+              <th>Your Commission (10%)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#ATL-894120</td>
+              <td>Emerald & Gold Swiss Voile Imperial Lace (5 yds)</td>
+              <td class="price-display">₦106,250</td>
+              <td class="price-display font-bold">₦10,625</td>
+              <td><span class="status-badge paid">PAID</span></td>
+            </tr>
+            <tr>
+              <td>#ATL-894121</td>
+              <td>Midnight Obsidian Italian Cashmere 160s (4 yds)</td>
+              <td class="price-display">₦168,000</td>
+              <td class="price-display font-bold">₦16,800</td>
+              <td><span class="status-badge paid">PAID</span></td>
+            </tr>
+            <tr>
+              <td>#TP-901452</td>
+              <td>Teepha Signature High Limited Sneaker (EU 44)</td>
+              <td class="price-display">₦98,000</td>
+              <td class="price-display font-bold">₦9,800</td>
+              <td>
+                <span class="status-badge pending">PENDING DISPATCH</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <!-- ============================================== -->
+    <!-- UNREGISTERED / PROSPECTIVE AFFILIATE INVITATION -->
+    <!-- ============================================== -->
+    <div class="join-affiliate-hero atelier-card">
+      <div class="join-hero-content">
+        <span class="join-badge">✦ THE TEEPHA GUILD PARTNERSHIP</span>
+        <h1 class="join-title">
+          Empower Your Craft.<br />Monetize Your Bespoke Clientele.
+        </h1>
+        <p class="join-subtitle">
+          Join Nigeria’s most prestigious network of master tailors, bespoke
+          designers, and fashion stylists. Earn
+          <strong>10% instant commission</strong> on every yard of Italian
+          Cashmere, St. Gallen Swiss Voile, and limited horology your clients
+          order.
+        </p>
+      </div>
+
+      <div class="guild-pillars-grid">
+        <div class="pillar-card">
+          <span class="pillar-icon">💎</span>
+          <h3 class="pillar-title">10% Direct Commission</h3>
+          <p class="pillar-desc">
+            High-ticket earnings with average client orders between ₦180,000 to
+            ₦450,000. Payouts every Tuesday directly to your Nigerian bank.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <span class="pillar-icon">📦</span>
+          <h3 class="pillar-title">Complimentary Swatch Ring Kit</h3>
+          <p class="pillar-desc">
+            Receive our physical cedar-lined swatch box with authentic cut
+            samples of Swiss lace and 160s wool for your studio clients.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <span class="pillar-icon">⚡</span>
+          <h3 class="pillar-title">Priority Lagos & Abuja Concierge</h3>
+          <p class="pillar-desc">
+            Dedicated WhatsApp partner desk to verify fabric yardages, reserve
+            rare bolts, and coordinate same-day courier delivery to your
+            workshop.
+          </p>
+        </div>
+      </div>
+
+      <!-- Application Form -->
+      <div class="application-form-card">
+        <h3 class="form-card-title">Apply to Join the Guild</h3>
+        <p class="form-card-sub">
+          Instant approval for fashion designers, master tailors, and wardrobe
+          consultants.
+        </p>
+
+        <form
+          (submit)="submitAffiliateApplication($event)"
+          class="affiliate-app-form"
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label>Brand / Studio Name *</label>
+              <input
+                type="text"
+                [(ngModel)]="appBrandName"
+                name="appBrandName"
+                required
+                placeholder="e.g. Sovereign Bespoke Guild"
+                class="luxe-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Instagram or TikTok Handle *</label>
+              <input
+                type="text"
+                [(ngModel)]="appHandle"
+                name="appHandle"
+                required
+                placeholder="e.g. @sovereign.bespoke"
+                class="luxe-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Primary Craft Focus</label>
+              <select
+                [(ngModel)]="appSpecialization"
+                name="appSpecialization"
+                class="luxe-input"
+              >
+                <option value="executive_senator">
+                  Executive Senator & Kaftan Tailoring
+                </option>
+                <option value="royal_agbada">
+                  Royal Yoruba Agbada Architecture
+                </option>
+                <option value="bridal_asoebi">
+                  Bridal Couture & Aso-Ebi Styling
+                </option>
+                <option value="contemporary">
+                  Contemporary African Luxury Fashion
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>WhatsApp Number for VIP Dispatch *</label>
+              <input
+                type="tel"
+                [(ngModel)]="appPhone"
+                name="appPhone"
+                required
+                placeholder="e.g. +234 803 123 4567"
+                class="luxe-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Payout Bank Name</label>
+              <input
+                type="text"
+                [(ngModel)]="appBankName"
+                name="appBankName"
+                required
+                placeholder="e.g. Zenith Bank / GTBank / Access Bank"
+                class="luxe-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>10-Digit NUBAN Account Number</label>
+              <input
+                type="text"
+                [(ngModel)]="appAccountNumber"
+                name="appAccountNumber"
+                required
+                placeholder="0123456789"
+                class="luxe-input"
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary activate-guild-btn">
+            Activate Affiliate Status & Enter Dashboard →
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+</div>

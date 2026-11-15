@@ -1,0 +1,702 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ThemeMode {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum LoyaltyTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  BLACK
+}
+
+enum AcquisitionChannel {
+  ORGANIC
+  PAID_SOCIAL
+  PAID_SEARCH
+  AFFILIATE
+  DIRECT
+  REFERRAL
+  WHATSAPP
+}
+
+enum ProductType {
+  FABRIC
+  ACCESSORY
+  SNEAKER
+  OTHER
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+  OUT_OF_STOCK
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  ORDER_UPDATE
+  LOYALTY_REWARD
+  PROMO
+  SYSTEM
+  AFFILIATE
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum AffiliateStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  phone              String              @unique // PRIMARY unique key for tracking
+  email              String?             @unique
+  googleId           String?             @unique
+  firstName          String?
+  lastName           String?
+  passwordHash       String?
+  role               UserRole            @default(CUSTOMER)
+  isGuest            Boolean             @default(true)
+  isEmailVerified    Boolean             @default(false)
+  isPhoneVerified    Boolean             @default(false)
+  avatarUrl          String?
+  preferredTheme     ThemeMode           @default(SYSTEM)
+  locale             String              @default("en-NG")
+  currency           String              @default("NGN")
+  loyaltyTier        LoyaltyTier         @default(BRONZE)
+  loyaltyPoints      Int                 @default(0)
+  totalSpent         Decimal             @default(0) @db.Decimal(12, 2)
+  referralCode       String              @unique @default(cuid())
+  referredById       String?
+  referredBy         User?               @relation("Referrals", fields: [referredById], references: [id])
+  referrals          User[]              @relation("Referrals")
+
+  // Marketing & Attribution
+  utmSource          String?
+  utmMedium          String?
+  utmCampaign        String?
+  utmContent         String?
+  utmTerm            String?
+  firstTouchAt       DateTime?
+  lastTouchAt        DateTime?
+  acquisitionChannel AcquisitionChannel?
+
+  // Tokens for AI image generation
+  imageGenTokens     Int                 @default(3)
+
+  // Relations
+  addresses          Address[]
+  orders             Order[]
+  cart               Cart?
+  wishlistItems      WishlistItem[]
+  reviews            Review[]
+  affiliateProfile   AffiliateProfile?
+  affiliateClicks    AffiliateClick[]
+  affiliateConversions AffiliateConversion[]
+  productViews       ProductView[]
+  productLikes       ProductLike[]
+  searchHistory      SearchHistory[]
+  notifications      Notification[]
+  supportTickets     SupportTicket[]
+  aiImageGenerations AiImageGeneration[]
+  loyaltyTransactions LoyaltyTransaction[]
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deletedAt          DateTime?
+
+  @@index([phone])
+  @@index([email])
+  @@index([referralCode])
+  @@index([loyaltyTier])
+  @@map("users")
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  label     String   @default("Home")
+  fullName  String
+  phone     String
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  country   String   @default("Nigeria")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+
+  @@map("addresses")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Brand {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  logoUrl     String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  products    Product[]
+
+  @@map("brands")
+}
+
+model Product {
+  id                 String         @id @default(cuid())
+  slug               String         @unique
+  name               String
+  description        String
+  shortDescription   String?
+  categoryId         String
+  category           Category       @relation(fields: [categoryId], references: [id])
+  brandId            String?
+  brand              Brand?         @relation(fields: [brandId], references: [id])
+
+  // Fabric / Sneaker / Accessory specific
+  productType        ProductType    @default(FABRIC)
+  material           String?
+  colorVariants      Json           @default("[]")
+  sizeVariants       Json           @default("[]")
+  attributes         Json           @default("{}")
+
+  price              Decimal        @db.Decimal(10, 2)
+  compareAtPrice     Decimal?       @db.Decimal(10, 2)
+  costPrice          Decimal?       @db.Decimal(10, 2)
+
+  status             ProductStatus  @default(DRAFT)
+  isFeatured         Boolean        @default(false)
+  isAffiliateEnabled Boolean        @default(true)
+
+  tags               String[]
+  trackInventory     Boolean        @default(true)
+  stockQuantity      Int            @default(0)
+  lowStockThreshold  Int            @default(5)
+
+  viewCount          Int            @default(0)
+  likeCount          Int            @default(0)
+  orderCount         Int            @default(0)
+  avgRating          Float          @default(0)
+  reviewCount        Int            @default(0)
+  trendingScore      Float          @default(0)
+
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  publishedAt        DateTime?
+  deletedAt          DateTime?
+
+  images             ProductImage[]
+  videos             ProductVideo[]
+  reviews            Review[]
+  orderItems         OrderItem[]
+  wishlistItems      WishlistItem[]
+  cartItems          CartItem[]
+  affiliateLinks     AffiliateLink[]
+  adLinks            AdLink[]
+  productViews       ProductView[]
+  productLikes       ProductLike[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([status, publishedAt])
+  @@index([productType])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  sortOrder Int      @default(0)
+  isPrimary Boolean  @default(false)
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+
+  @@map("product_images")
+}
+
+model ProductVideo {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  thumbnail String?
+  duration  Int?
+  createdAt DateTime @default(now())
+
+  @@map("product_videos")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id])
+  couponId  String?
+  coupon    Coupon?    @relation(fields: [couponId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  color     String?
+  size      String?
+  unitPrice Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId, color, size])
+  @@map("cart_items")
+}
+
+model Order {
+  id              String               @id @default(cuid())
+  orderNumber     String               @unique @default(cuid())
+  userId          String
+  user            User                 @relation(fields: [userId], references: [id])
+  addressId       String?
+  address         Address?             @relation(fields: [addressId], references: [id])
+  status          OrderStatus          @default(PENDING)
+  subtotal        Decimal              @db.Decimal(10, 2)
+  discountAmount  Decimal              @default(0) @db.Decimal(10, 2)
+  deliveryFee     Decimal              @default(0) @db.Decimal(10, 2)
+  total           Decimal              @db.Decimal(10, 2)
+  couponId        String?
+  coupon          Coupon?              @relation(fields: [couponId], references: [id])
+  notes           String?
+  idempotencyKey  String               @unique @default(cuid())
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  affiliateLinkId String?
+  affiliateLink   AffiliateLink?       @relation(fields: [affiliateLinkId], references: [id])
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  deletedAt       DateTime?
+  items           OrderItem[]
+  payments        Payment[]
+  statusHistory   OrderStatusHistory[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  color      String?
+  size       String?
+  unitPrice  Decimal  @db.Decimal(10, 2)
+  totalPrice Decimal  @db.Decimal(10, 2)
+  reviewed   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id])
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now())
+
+  @@map("order_status_history")
+}
+
+model Payment {
+  id              String           @id @default(cuid())
+  orderId         String
+  order           Order            @relation(fields: [orderId], references: [id])
+  gateway         String           @default("paystack")
+  reference       String           @unique
+  status          PaymentStatus    @default(PENDING)
+  amount          Decimal          @db.Decimal(10, 2)
+  currency        String           @default("NGN")
+  gatewayResponse Json?
+  paidAt          DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  attempts        PaymentAttempt[]
+
+  @@map("payments")
+}
+
+model PaymentAttempt {
+  id        String   @id @default(cuid())
+  paymentId String
+  payment   Payment  @relation(fields: [paymentId], references: [id])
+  gateway   String
+  reference String
+  status    String
+  response  Json?
+  createdAt DateTime @default(now())
+
+  @@map("payment_attempts")
+}
+
+model Review {
+  id         String    @id @default(cuid())
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id])
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  rating     Int
+  title      String?
+  body       String?
+  images     String[]
+  isVerified Boolean   @default(false)
+  isApproved Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  @@map("reviews")
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("wishlist_items")
+}
+
+model Coupon {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  description    String?
+  discountType   String    @default("PERCENTAGE")
+  discountValue  Decimal   @db.Decimal(10, 2)
+  minOrderAmount Decimal?  @db.Decimal(10, 2)
+  maxDiscount    Decimal?  @db.Decimal(10, 2)
+  usageLimit     Int?
+  usageCount     Int       @default(0)
+  startsAt       DateTime?
+  expiresAt      DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  carts          Cart[]
+  orders         Order[]
+
+  @@map("coupons")
+}
+
+model AffiliateProfile {
+  id             String                @id @default(cuid())
+  userId         String                @unique
+  user           User                  @relation(fields: [userId], references: [id])
+  status         AffiliateStatus       @default(PENDING)
+  commissionRate Decimal               @default(10) @db.Decimal(5, 2)
+  totalEarnings  Decimal               @default(0) @db.Decimal(10, 2)
+  pendingBalance Decimal               @default(0) @db.Decimal(10, 2)
+  paidBalance    Decimal               @default(0) @db.Decimal(10, 2)
+  bankName       String?
+  bankAccount    String?
+  bankCode       String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  links          AffiliateLink[]
+  clicks         AffiliateClick[]
+  conversions    AffiliateConversion[]
+
+  @@map("affiliate_profiles")
+}
+
+model AffiliateLink {
+  id              String                @id @default(cuid())
+  affiliateId     String
+  affiliate       AffiliateProfile      @relation(fields: [affiliateId], references: [id])
+  productId       String?
+  product         Product?              @relation(fields: [productId], references: [id])
+  code            String                @unique
+  label           String?
+  targetUrl       String
+  clickCount      Int                   @default(0)
+  conversionCount Int                   @default(0)
+  createdAt       DateTime              @default(now())
+  clicks          AffiliateClick[]
+  conversions     AffiliateConversion[]
+  orders          Order[]
+
+  @@map("affiliate_links")
+}
+
+model AffiliateClick {
+  id          String           @id @default(cuid())
+  linkId      String
+  link        AffiliateLink    @relation(fields: [linkId], references: [id])
+  affiliateId String
+  affiliate   AffiliateProfile @relation(fields: [affiliateId], references: [id])
+  userId      String?
+  user        User?            @relation(fields: [userId], references: [id])
+  ipAddress   String?
+  userAgent   String?
+  referrer    String?
+  createdAt   DateTime         @default(now())
+
+  @@map("affiliate_clicks")
+}
+
+model AffiliateConversion {
+  id          String           @id @default(cuid())
+  linkId      String
+  link        AffiliateLink    @relation(fields: [linkId], references: [id])
+  affiliateId String
+  affiliate   AffiliateProfile @relation(fields: [affiliateId], references: [id])
+  userId      String?
+  user        User?            @relation(fields: [userId], references: [id])
+  orderId     String?
+  amount      Decimal          @db.Decimal(10, 2)
+  commission  Decimal          @db.Decimal(10, 2)
+  isPaid      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  @@map("affiliate_conversions")
+}
+
+model ProductView {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  sessionId String?
+  createdAt DateTime @default(now())
+
+  @@map("product_views")
+}
+
+model ProductLike {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("product_likes")
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  query     String
+  createdAt DateTime @default(now())
+
+  @@map("search_history")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  body      String
+  imageUrl  String?
+  isRead    Boolean          @default(false)
+  data      Json?
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+model SupportTicket {
+  id         String              @id @default(cuid())
+  userId     String
+  user       User                @relation(fields: [userId], references: [id])
+  subject    String
+  status     SupportTicketStatus @default(OPEN)
+  priority   String              @default("NORMAL")
+  assignedTo String?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  messages   SupportMessage[]
+
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id          String        @id @default(cuid())
+  ticketId    String
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id])
+  senderId    String
+  isAdmin     Boolean       @default(false)
+  body        String
+  attachments String[]
+  createdAt   DateTime      @default(now())
+
+  @@map("support_messages")
+}
+
+model AiImageGeneration {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  prompt      String
+  styleConfig Json?
+  resultUrl   String?
+  status      String   @default("PENDING")
+  tokensUsed  Int      @default(1)
+  createdAt   DateTime @default(now())
+
+  @@map("ai_image_generations")
+}
+
+model LoyaltyTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  points      Int
+  type        String
+  description String
+  orderId     String?
+  createdAt   DateTime @default(now())
+
+  @@map("loyalty_transactions")
+}
+
+model MarketingCampaign {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  budget      Decimal?  @db.Decimal(10, 2)
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  adLinks     AdLink[]
+
+  @@map("marketing_campaigns")
+}
+
+model AdLink {
+  id          String             @id @default(cuid())
+  campaignId  String?
+  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id])
+  productId   String?
+  product     Product?           @relation(fields: [productId], references: [id])
+  code        String             @unique
+  label       String
+  targetUrl   String
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  clickCount  Int                @default(0)
+  createdAt   DateTime           @default(now())
+  utmEvents   UtmEvent[]
+
+  @@map("ad_links")
+}
+
+model UtmEvent {
+  id          String   @id @default(cuid())
+  adLinkId    String?
+  adLink      AdLink?  @relation(fields: [adLinkId], references: [id])
+  userId      String?
+  sessionId   String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  eventType   String
+  createdAt   DateTime @default(now())
+
+  @@map("utm_events")
+}
+
+model OutboxEvent {
+  id          String    @id @default(cuid())
+  eventType   String
+  aggregateId String
+  payload     Json
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@map("outbox_events")
+}

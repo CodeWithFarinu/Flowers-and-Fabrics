@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+@import '../../../libs/shared/ui-tokens/src/lib/tokens.css';
+
+/* Global web app typography and reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}

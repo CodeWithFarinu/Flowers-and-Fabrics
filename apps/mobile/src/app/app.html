@@ -1,2 +1,40 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+<ion-app>
+  <ion-tabs>
+    <ion-router-outlet></ion-router-outlet>
+
+    <ion-tab-bar slot="bottom" class="mobile-main-tab-bar glass-header">
+      <ion-tab-button tab="feed" [routerLink]="['/tabs/feed']">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <ion-label>Feed</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button tab="explore" [routerLink]="['/tabs/explore']">
+        <ion-icon name="search-outline"></ion-icon>
+        <ion-label>Explore</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button
+        tab="studio"
+        [routerLink]="['/tabs/studio']"
+        class="special-tab"
+      >
+        <ion-icon name="color-wand-outline"></ion-icon>
+        <ion-label>Studio</ion-label>
+        <ion-badge color="dark">{{ authStore.tokenBalance() }}</ion-badge>
+      </ion-tab-button>
+
+      <ion-tab-button tab="cart" [routerLink]="['/tabs/cart']">
+        <ion-icon name="bag-handle-outline"></ion-icon>
+        <ion-label>Bag</ion-label>
+        @if (cartStore.itemCount() > 0) {
+        <ion-badge color="dark">{{ cartStore.itemCount() }}</ion-badge>
+        }
+      </ion-tab-button>
+
+      <ion-tab-button tab="profile" [routerLink]="['/tabs/profile']">
+        <ion-icon name="person-outline"></ion-icon>
+        <ion-label>Profile</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+</ion-app>

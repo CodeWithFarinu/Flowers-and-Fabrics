@@ -1,0 +1,195 @@
+<div class="admin-page-container">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">FULFILMENT PIPELINE</span>
+      <h1 class="page-title">Orders Kanban & Dispatch Board</h1>
+    </div>
+  </div>
+
+  <!-- Fulfilment Kanban Board -->
+  <div class="kanban-grid">
+    <!-- Column 1: Confirmed -->
+    <div class="kanban-column atelier-card">
+      <div class="col-header">
+        <div class="col-title-wrap">
+          <span class="status-indicator confirmed"></span>
+          <h3>Confirmed / Cutting</h3>
+        </div>
+        <span class="count-tag">{{
+          getOrdersByStatus('confirmed').length
+        }}</span>
+      </div>
+
+      <div class="cards-list">
+        @for (ord of getOrdersByStatus('confirmed'); track ord.id) {
+          <div class="order-kanban-card atelier-card">
+            <div class="card-ref-row">
+              <strong>#{{ ord.orderNumber }}</strong>
+              <span class="price-display total-tag"
+                >₦{{ ord.total.toLocaleString() }}</span
+              >
+            </div>
+
+            <div class="customer-info">
+              <span class="cust-name">{{ ord.customerDetails.name }}</span>
+              <span class="cust-phone">{{ ord.customerDetails.phone }}</span>
+              <span class="cust-loc"
+                >{{ ord.deliveryDetails.lga }},
+                {{ ord.deliveryDetails.state }}</span
+              >
+            </div>
+
+            <div class="items-summary">
+              @for (it of ord.items; track it.id) {
+                <div class="item-mini-line">
+                  <span>{{ it.productTitle }}</span>
+                  <small
+                    >({{ it.quantity }}
+                    {{ it.unit === 'yard' ? 'yds' : '' }})</small
+                  >
+                </div>
+              }
+            </div>
+
+            <div class="card-actions-row">
+              <a
+                [href]="ord.whatsappTrackingUrl"
+                target="_blank"
+                class="btn-ghost mini-btn"
+              >
+                WhatsApp ↗
+              </a>
+              <button
+                type="button"
+                class="btn-primary mini-btn"
+                (click)="advanceStatus(ord.id, 'packed')"
+              >
+                Mark Packed →
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Column 2: Packed -->
+    <div class="kanban-column atelier-card">
+      <div class="col-header">
+        <div class="col-title-wrap">
+          <span class="status-indicator packed"></span>
+          <h3>Packed / Vault Staged</h3>
+        </div>
+        <span class="count-tag">{{ getOrdersByStatus('packed').length }}</span>
+      </div>
+
+      <div class="cards-list">
+        @for (ord of getOrdersByStatus('packed'); track ord.id) {
+          <div class="order-kanban-card atelier-card">
+            <div class="card-ref-row">
+              <strong>#{{ ord.orderNumber }}</strong>
+              <span class="price-display total-tag"
+                >₦{{ ord.total.toLocaleString() }}</span
+              >
+            </div>
+
+            <div class="customer-info">
+              <span class="cust-name">{{ ord.customerDetails.name }}</span>
+              <span class="cust-phone">{{ ord.customerDetails.phone }}</span>
+              <span class="cust-loc"
+                >{{ ord.deliveryDetails.lga }},
+                {{ ord.deliveryDetails.state }}</span
+              >
+            </div>
+
+            <div class="card-actions-row">
+              <a
+                [href]="ord.whatsappTrackingUrl"
+                target="_blank"
+                class="btn-ghost mini-btn"
+              >
+                WhatsApp ↗
+              </a>
+              <button
+                type="button"
+                class="btn-primary mini-btn"
+                (click)="advanceStatus(ord.id, 'shipped')"
+              >
+                Hand to Rider →
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Column 3: Shipped -->
+    <div class="kanban-column atelier-card">
+      <div class="col-header">
+        <div class="col-title-wrap">
+          <span class="status-indicator shipped"></span>
+          <h3>With Dispatch Rider</h3>
+        </div>
+        <span class="count-tag">{{ getOrdersByStatus('shipped').length }}</span>
+      </div>
+
+      <div class="cards-list">
+        @for (ord of getOrdersByStatus('shipped'); track ord.id) {
+          <div class="order-kanban-card atelier-card">
+            <div class="card-ref-row">
+              <strong>#{{ ord.orderNumber }}</strong>
+              <span class="price-display total-tag"
+                >₦{{ ord.total.toLocaleString() }}</span
+              >
+            </div>
+
+            <div class="customer-info">
+              <span class="cust-name">{{ ord.customerDetails.name }}</span>
+              <span class="cust-phone">{{ ord.customerDetails.phone }}</span>
+            </div>
+
+            <div class="card-actions-row">
+              <button
+                type="button"
+                class="btn-primary mini-btn"
+                (click)="advanceStatus(ord.id, 'delivered')"
+              >
+                Confirm Delivered ✓
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Column 4: Delivered -->
+    <div class="kanban-column atelier-card">
+      <div class="col-header">
+        <div class="col-title-wrap">
+          <span class="status-indicator delivered"></span>
+          <h3>Delivered & Complete</h3>
+        </div>
+        <span class="count-tag">{{
+          getOrdersByStatus('delivered').length
+        }}</span>
+      </div>
+
+      <div class="cards-list">
+        @for (ord of getOrdersByStatus('delivered'); track ord.id) {
+          <div class="order-kanban-card atelier-card" style="opacity: 0.85">
+            <div class="card-ref-row">
+              <strong>#{{ ord.orderNumber }}</strong>
+              <span class="price-display total-tag"
+                >₦{{ ord.total.toLocaleString() }}</span
+              >
+            </div>
+            <div class="customer-info">
+              <span class="cust-name">{{ ord.customerDetails.name }}</span>
+              <span class="cust-loc">{{ ord.deliveryDetails.state }}</span>
+            </div>
+            <span class="delivered-badge">COMPLETED ✓</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

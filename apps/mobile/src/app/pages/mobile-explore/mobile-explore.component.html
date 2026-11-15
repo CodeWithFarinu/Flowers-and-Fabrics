@@ -1,0 +1,46 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="glass-header">
+    <ion-title>Explore & Search</ion-title>
+  </ion-toolbar>
+
+  <div class="search-bar-wrap">
+    <ion-searchbar
+      placeholder="Search Swiss lace, Italian cashmere, sneakers..."
+      [value]="productStore.searchQuery()"
+      (ionInput)="onSearch($event)"
+      animated
+    ></ion-searchbar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Trending Searches in Lagos -->
+  <div class="trending-pills-section">
+    <span class="trending-label">Trending in Lagos:</span>
+    <div class="pills-scroll">
+      <button type="button" class="trend-pill" (click)="searchTag('Senator')">
+        #Senator160s
+      </button>
+      <button
+        type="button"
+        class="trend-pill"
+        (click)="searchTag('Swiss Lace')"
+      >
+        #SwissVoileLace
+      </button>
+      <button type="button" class="trend-pill" (click)="searchTag('Cufflinks')">
+        #OnyxCufflinks
+      </button>
+      <button type="button" class="trend-pill" (click)="searchTag('Sneaker')">
+        #MonochromeSneakers
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Grid -->
+  <div class="explore-results-grid">
+    @for (prod of productStore.filteredProducts(); track prod.id) {
+      <atelier-product-card [product]="prod" aspectRatio="4 / 5" />
+    }
+  </div>
+</ion-content>

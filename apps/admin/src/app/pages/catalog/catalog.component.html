@@ -1,0 +1,632 @@
+<div class="admin-page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">CATALOG ARCHITECTURE & INVENTORY</span>
+      <h1 class="page-title">Luxury Fabric Vault & Product Mutation</h1>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="openAiModelGenerator()"
+      >
+        ✦ Generate AI Model Shots
+      </button>
+      <button type="button" class="btn-primary" (click)="openAddProductModal()">
+        + Add New Luxury Piece
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Metrics -->
+  <div class="kpi-grid">
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Active Catalog Pieces</span>
+      <div class="kpi-val price-display">
+        {{ productStore.products().length }}
+      </div>
+      <span class="kpi-trend positive"
+        >Fully indexed on Web & Mobile feeds</span
+      >
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Fabrics Inventory Value</span>
+      <div class="kpi-val price-display">
+        ₦{{ totalInventoryValue().toLocaleString() }}
+      </div>
+      <span class="kpi-trend neutral">Based on live vault stock yardage</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Low Stock Alerts</span>
+      <div class="kpi-val price-display font-bold text-amber">
+        {{ lowStockCount() }}
+      </div>
+      <span class="kpi-trend" [class.positive]="lowStockCount() === 0">
+        {{
+          lowStockCount() > 0
+            ? 'Requires bolt replenishment'
+            : 'Adequate reserve'
+        }}
+      </span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">AI Photorealistic Drapes</span>
+      <div class="kpi-val price-display">24 Views</div>
+      <span class="kpi-trend positive">Rendered via Style Studio</span>
+    </div>
+  </div>
+
+  <!-- Filters & Search Toolbar -->
+  <div class="table-toolbar atelier-card">
+    <div class="search-wrap">
+      <svg
+        class="search-icon"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search catalog by title, brand, weave, composition, or tag..."
+        [ngModel]="productStore.searchQuery()"
+        (ngModelChange)="productStore.setSearchQuery($event)"
+      />
+    </div>
+
+    <div class="filter-pills">
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="productStore.categoryFilter() === 'all'"
+        (click)="productStore.setCategoryFilter('all')"
+      >
+        All Items ({{ productStore.products().length }})
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="productStore.categoryFilter() === 'fabrics'"
+        (click)="productStore.setCategoryFilter('fabrics')"
+      >
+        Fabrics
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="productStore.categoryFilter() === 'accessories'"
+        (click)="productStore.setCategoryFilter('accessories')"
+      >
+        Accessories
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="productStore.categoryFilter() === 'sneakers'"
+        (click)="productStore.setCategoryFilter('sneakers')"
+      >
+        Sneakers
+      </button>
+    </div>
+  </div>
+
+  <!-- Product Data Table with Edit/Delete & Inline Mutation -->
+  <div class="table-card atelier-card">
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Piece & Brand</th>
+            <th>Category</th>
+            <th>Fabric Weave / Spec</th>
+            <th>Price (₦ NGN)</th>
+            <th>Stock Qty</th>
+            <th>AI Drapes</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of productStore.filteredProducts(); track p.id) {
+            <tr>
+              <td>
+                <div class="prod-cell">
+                  <img
+                    [src]="p.featuredImage"
+                    [alt]="p.title"
+                    class="cell-thumb"
+                  />
+                  <div class="prod-info">
+                    <strong class="prod-title">{{ p.title }}</strong>
+                    <span class="cell-brand"
+                      >{{ p.brand }} · {{ p.unit | uppercase }}</span
+                    >
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="category-badge">{{ p.category | uppercase }}</span>
+              </td>
+              <td>
+                <div class="spec-cell">
+                  <span>{{ p.attributes?.weaveType || 'Standard Weave' }}</span>
+                  <small>{{
+                    p.attributes?.materialComposition || 'Premium Blend'
+                  }}</small>
+                </div>
+              </td>
+              <td>
+                <div class="inline-edit-wrap">
+                  <span>₦</span>
+                  <input
+                    type="number"
+                    class="inline-input"
+                    [ngModel]="p.price"
+                    (change)="updatePrice(p.id, $event, p.stockQty)"
+                  />
+                </div>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="inline-input stock-input"
+                  [ngModel]="p.stockQty"
+                  (change)="updateStock(p.id, p.price, $event)"
+                />
+              </td>
+              <td>
+                <span class="ai-views-count">
+                  ✦ {{ p.aiModelViews ? p.aiModelViews.length : 0 }} views
+                </span>
+              </td>
+              <td>
+                <span
+                  class="stock-badge"
+                  [class.in-stock]="p.stockStatus === 'in_stock'"
+                  [class.low-stock]="p.stockStatus === 'low_stock'"
+                  [class.out-of-stock]="p.stockStatus === 'out_of_stock'"
+                >
+                  {{ p.stockStatus | uppercase }}
+                </span>
+              </td>
+              <td>
+                <div class="action-btn-group">
+                  <button
+                    type="button"
+                    class="btn-ghost mini-btn"
+                    (click)="openEditProductModal(p)"
+                    title="Edit full product details"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-ghost mini-btn text-amber"
+                    (click)="openAiModelForProduct(p)"
+                    title="Generate AI shot"
+                  >
+                    ✦ AI
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-ghost mini-btn text-danger"
+                    (click)="confirmDeleteProduct(p)"
+                    title="Remove piece from catalog"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Product Drawer/Modal: Add or Edit Piece -->
+@if (showProductFormModal()) {
+  <div class="modal-backdrop" (click)="closeProductFormModal()">
+    <div
+      class="modal-box drawer-box atelier-card"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">{{
+            isEditingMode() ? 'MUTATION & EDIT' : 'NEW CATALOG PIECE'
+          }}</span>
+          <h3 class="modal-title">
+            {{ isEditingMode() ? 'Edit Luxury Piece' : 'Add New Luxury Piece' }}
+          </h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="closeProductFormModal()"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body form-scroll">
+        <!-- Section 1: Basic Information -->
+        <div class="form-section">
+          <h4 class="form-sec-title">1. Basic Identity & Branding</h4>
+          <div class="form-group">
+            <label class="form-label">Product Title *</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="e.g. Royal Emerald Super 180s Cashmere Wool"
+              [(ngModel)]="formTitle"
+            />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Brand / Mill *</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="e.g. Vitale Barberis Canonico"
+                [(ngModel)]="formBrand"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" [(ngModel)]="formCategory">
+                <option value="fabrics">
+                  Fabrics (Senator, Voile, Cashmere)
+                </option>
+                <option value="accessories">
+                  Accessories (Cufflinks, Horology)
+                </option>
+                <option value="sneakers">Sneakers (Luxury Footwear)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Product Description</label>
+            <textarea
+              rows="3"
+              class="form-input"
+              placeholder="Heirloom grade woven texture for executive wear..."
+              [(ngModel)]="formDescription"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Section 2: Pricing, Units & Vault Reserves -->
+        <div class="form-section">
+          <h4 class="form-sec-title">2. Pricing & Vault Inventory</h4>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Price (₦ NGN) *</label>
+              <input
+                type="number"
+                class="form-input"
+                placeholder="45000"
+                [(ngModel)]="formPrice"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Compare At (₦ NGN)</label>
+              <input
+                type="number"
+                class="form-input"
+                placeholder="60000"
+                [(ngModel)]="formComparePrice"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit</label>
+              <select class="form-select" [(ngModel)]="formUnit">
+                <option value="yard">Yard (Fabrics)</option>
+                <option value="piece">Piece (Sets / Watches)</option>
+                <option value="pair">Pair (Sneakers / Shoes)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Stock Quantity</label>
+              <input
+                type="number"
+                class="form-input"
+                [(ngModel)]="formStockQty"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Min Order Qty</label>
+              <input
+                type="number"
+                class="form-input"
+                [(ngModel)]="formMinOrderQty"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock Status</label>
+              <select class="form-select" [(ngModel)]="formStockStatus">
+                <option value="in_stock">In Stock</option>
+                <option value="low_stock">Low Stock</option>
+                <option value="out_of_stock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Technical Fabric Attributes -->
+        <div class="form-section">
+          <h4 class="form-sec-title">3. Technical Fabric Attributes</h4>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Material Composition</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="e.g. 100% Superfine Italian Cashmere Wool"
+                [(ngModel)]="formComposition"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Weave Type / Grade</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="e.g. 160s Twill Double Weave"
+                [(ngModel)]="formWeave"
+              />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Fabric Weight (GSM)</label>
+              <input
+                type="number"
+                class="form-input"
+                placeholder="280"
+                [(ngModel)]="formGsm"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Occasion / Styling</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="e.g. Executive Senator, Black-Tie"
+                [(ngModel)]="formOccasion"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Imagery & Colors -->
+        <div class="form-section">
+          <h4 class="form-sec-title">4. Imagery & Color Swatch</h4>
+          <div class="form-group">
+            <label class="form-label">Featured Image URL *</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="https://images.unsplash.com/..."
+              [(ngModel)]="formImageUrl"
+            />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Color Name</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="Obsidian Black"
+                [(ngModel)]="formColorName"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color Hex Code</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="#111827"
+                [(ngModel)]="formColorHex"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Search Tags (comma separated)</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="senator, cashmere, lagos, luxury"
+              [(ngModel)]="formTagsStr"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="closeProductFormModal()"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn-primary" (click)="saveProduct()">
+          {{
+            isEditingMode()
+              ? 'Save Product Changes'
+              : 'Publish to Catalog Vault'
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- AI Model Shots Generator Modal -->
+@if (showAiModal()) {
+  <div class="modal-backdrop" (click)="showAiModal.set(false)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">ADMIN AI GENERATION STUDIO</span>
+          <h3 class="modal-title">Generate Multi-Angle Model Shots</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="showAiModal.set(false)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <label class="form-label">Target Product</label>
+        <select class="form-select" [(ngModel)]="modalProductId">
+          @for (p of productStore.products(); track p.id) {
+            <option [value]="p.id">{{ p.title }} ({{ p.category }})</option>
+          }
+        </select>
+
+        <div class="form-row-2">
+          <div>
+            <label class="form-label">Garment Silhouette</label>
+            <select class="form-select" [(ngModel)]="modalGarment">
+              <option value="Executive Senator Suit">
+                Executive Senator Suit
+              </option>
+              <option value="Imperial Agbada (4-Piece)">
+                Imperial Agbada (4-Piece)
+              </option>
+              <option value="Modern Kaftan with Collar">
+                Modern Kaftan with Collar
+              </option>
+              <option value="Bespoke Double-Breasted Suit">
+                Bespoke Double-Breasted Suit
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label">Camera Angle</label>
+            <select class="form-select" [(ngModel)]="modalAngle">
+              <option value="front">Front View (Standing)</option>
+              <option value="side">Side Profile / Flow</option>
+              <option value="drape_close_up">Drape & Weave Close-Up</option>
+              <option value="full_silhouette">
+                Full Silhouette (Editorial)
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label">Model Melanin Tone</label>
+          <select class="form-select" [(ngModel)]="modalSkinTone">
+            <option value="deep_melanin">
+              Deep Melanin (Rich Obsidian Undertone)
+            </option>
+            <option value="warm_caramel">
+              Warm Caramel (Golden Undertone)
+            </option>
+            <option value="chestnut">Chestnut (Neutral Undertone)</option>
+          </select>
+        </div>
+
+        <div class="ai-banner">
+          <strong>✦ Neural Rendering Pipeline Active</strong>
+          <p>
+            Generates high-resolution drape visualization mapped directly to
+            product lighting.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="showAiModal.set(false)"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="adminStore.isGeneratingModelShot()"
+          (click)="triggerAiGeneration()"
+        >
+          {{
+            adminStore.isGeneratingModelShot()
+              ? 'Rendering Model Shot...'
+              : '✦ Generate Shot'
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (productToDelete(); as prod) {
+  <div class="modal-backdrop" (click)="productToDelete.set(null)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag text-danger">CONFIRM CATALOG DELETION</span>
+          <h3 class="modal-title">Delete Luxury Piece?</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="productToDelete.set(null)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="delete-warning">
+          Are you sure you want to delete
+          <strong>"{{ prod.title }}"</strong>? This piece will be immediately
+          removed from the customer catalog, search indices, and story rails.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="productToDelete.set(null)"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn-danger" (click)="executeDelete()">
+          Permanently Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,20 @@
+.mobile-main-tab-bar {
+  --background: var(--bg-elevated);
+  --color: var(--text-muted);
+  --color-selected: var(--text);
+  border-top: 1px solid var(--border);
+  height: 56px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+ion-tab-button {
+  --color-selected: var(--text);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+ion-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+}

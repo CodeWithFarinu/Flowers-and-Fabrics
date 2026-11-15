@@ -1,0 +1,114 @@
+<div class="hero-slider-container">
+  <div class="slider-viewport">
+    @for (slide of slides; track slide.id; let i = $index) {
+      <div
+        class="slide-frame"
+        [class.active]="currentSlideIndex() === i"
+        [class.prev]="currentSlideIndex() > i"
+        [class.next]="currentSlideIndex() < i"
+      >
+        <!-- Background Backdrop with Dark Gradient Overlay -->
+        <div class="slide-media-layer">
+          <img
+            [src]="slide.imageUrl"
+            [alt]="slide.title"
+            class="slide-bg-img"
+            loading="eager"
+          />
+          <div class="scrim-overlay"></div>
+        </div>
+
+        <!-- Slide Editorial Content -->
+        <div class="slide-content-layer">
+          <div class="slide-meta-row">
+            <span class="editorial-badge">
+              <span class="live-pulse"></span>
+              {{ slide.badge }}
+            </span>
+            <span class="slide-counter">
+              0{{ i + 1 }} <span class="counter-divider">/</span> 0{{
+                slides.length
+              }}
+            </span>
+          </div>
+
+          <div class="slide-headline-wrap">
+            <span class="slide-eyebrow">{{ slide.eyebrow }}</span>
+            <h1 class="slide-title" [innerHTML]="slide.title"></h1>
+            <p class="slide-subtitle">{{ slide.subtitle }}</p>
+          </div>
+
+          <div class="slide-actions-row">
+            <a [routerLink]="slide.ctaLink" class="btn-luxe-primary">
+              {{ slide.ctaText }}
+              <span class="arrow-icon">→</span>
+            </a>
+            @if (slide.secondaryCtaText && slide.secondaryCtaLink) {
+              <a [routerLink]="slide.secondaryCtaLink" class="btn-luxe-ghost">
+                {{ slide.secondaryCtaText }}
+              </a>
+            }
+          </div>
+        </div>
+
+        <!-- Float-Anchored Accent Kicker Card -->
+        <div class="slide-kicker-card">
+          <span class="kicker-glow-bar"></span>
+          <div class="kicker-body">
+            <span class="kicker-value">{{ slide.accentStat.value }}</span>
+            <span class="kicker-label">{{ slide.accentStat.label }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Uncommon Slider Bottom Controls & Progress Rails -->
+  <div class="slider-controls-bar">
+    <div class="slider-thumbnails-track">
+      @for (s of slides; track s.id; let idx = $index) {
+        <button
+          type="button"
+          class="thumb-pill-btn"
+          [class.active]="currentSlideIndex() === idx"
+          (click)="goToSlide(idx)"
+          [attr.aria-label]="'Go to slide ' + (idx + 1)"
+        >
+          <span class="pill-number">0{{ idx + 1 }}</span>
+          <span class="pill-title">{{ s.eyebrow }}</span>
+          <div class="pill-progress-rail">
+            <div
+              class="pill-progress-fill"
+              [style.width]="
+                currentSlideIndex() === idx
+                  ? progressPercent() + '%'
+                  : currentSlideIndex() > idx
+                    ? '100%'
+                    : '0%'
+              "
+            ></div>
+          </div>
+        </button>
+      }
+    </div>
+
+    <div class="arrow-nav-group">
+      <button
+        type="button"
+        class="nav-arrow-btn prev-btn"
+        (click)="prevSlide()"
+        aria-label="Previous Slide"
+      >
+        ←
+      </button>
+      <button
+        type="button"
+        class="nav-arrow-btn next-btn"
+        (click)="nextSlide()"
+        aria-label="Next Slide"
+      >
+        →
+      </button>
+    </div>
+  </div>
+</div>

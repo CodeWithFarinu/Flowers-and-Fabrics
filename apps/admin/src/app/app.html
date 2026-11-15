@@ -1,2 +1,422 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+<div class="admin-shell">
+  <!-- Collapsible Luxury Sidebar -->
+  <aside class="admin-sidebar" [class.collapsed]="sidebarCollapsed()">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <svg
+          class="brand-monogram-svg"
+          width="26"
+          height="26"
+          viewBox="0 0 48 48"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient
+              id="tfAdminGold"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stop-color="#FDE68A" />
+              <stop offset="30%" stop-color="#F59E0B" />
+              <stop offset="70%" stop-color="#D97706" />
+              <stop offset="100%" stop-color="#92400E" />
+            </linearGradient>
+          </defs>
+          <circle
+            cx="24"
+            cy="24"
+            r="22"
+            stroke="url(#tfAdminGold)"
+            stroke-width="1.2"
+            stroke-opacity="0.75"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r="19.5"
+            stroke="currentColor"
+            stroke-width="0.5"
+            stroke-opacity="0.25"
+            stroke-dasharray="1.5 2"
+          />
+          <path
+            d="M10 13 H28 V15.5 H25.5 V14.5 H20.5 V35 H23 V36.5 H15 V35 H17.5 V14.5 H12.5 V15.5 H10 Z"
+            fill="currentColor"
+          />
+          <path
+            d="M22 17.5 C25 15.5 32 15 36 17 C35.5 19.5 34 20 33 19 C30.5 18 26.5 18.5 25 20.5 L24 23 H33.5 V25.5 H23 L20 37 H17 L21.5 20 C21.8 19 21.8 18.2 22 17.5 Z"
+            fill="url(#tfAdminGold)"
+          />
+          <path
+            d="M21 27 C24 26 30 26 32 28 C30 29.5 25 29 20.5 28.5 Z"
+            fill="url(#tfAdminGold)"
+          />
+          <circle cx="36" cy="13" r="1.8" fill="url(#tfAdminGold)" />
+        </svg>
+        @if (!sidebarCollapsed()) {
+        <span class="brand-label">TEEPHA <small>FLOWERS & FABRICS</small></span>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="toggle-sidebar-btn"
+        (click)="toggleSidebar()"
+        title="Toggle sidebar"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation Menu Items with Bespoke SVGs -->
+    <nav class="sidebar-nav">
+      <!-- 1. Executive Dashboard -->
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        title="Dashboard & Velocity"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Dashboard</span>
+        }
+      </a>
+
+      <!-- 2. Catalog & Vault -->
+      <a
+        routerLink="/catalog"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Catalog & AI Studio"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+            ></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Catalog & Vault</span>
+        }
+      </a>
+
+      <!-- 3. Orders Kanban -->
+      <a
+        routerLink="/orders"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Orders Fulfilment"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+            ></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Orders Kanban</span>
+        }
+      </a>
+
+      <!-- 4. Deliveries & Fleet -->
+      <a
+        routerLink="/deliveries"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Courier Logistics & Dispatch"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Fleet & Dispatch</span>
+        }
+      </a>
+
+      <!-- 5. Treasury & Payments -->
+      <a
+        routerLink="/payments"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Treasury & Gateway Settlements"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Treasury & Payments</span>
+        }
+      </a>
+
+      <!-- 6. Patrons & VIPs -->
+      <a
+        routerLink="/customers"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Patrons & VIP Directorate"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Patrons & VIPs</span>
+        }
+      </a>
+
+      <!-- 7. Attribution & Story Rails -->
+      <a
+        routerLink="/marketing"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Attribution & Story Rails"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="2"></circle>
+            <path
+              d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"
+            ></path>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Story Rails & Ads</span>
+        }
+      </a>
+
+      <!-- 8. Concierge & Live Chat -->
+      <a
+        routerLink="/support"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Support Desk & AI Copilot"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            ></path>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Concierge & Live Desk</span>
+        }
+      </a>
+
+      <!-- 9. Settings -->
+      <a
+        routerLink="/settings"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Platform Settings"
+      >
+        <span class="nav-icon">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+            ></path>
+          </svg>
+        </span>
+        @if (!sidebarCollapsed()) {
+        <span>Settings</span>
+        }
+      </a>
+    </nav>
+
+    <!-- Footer Profile -->
+    <div class="sidebar-footer">
+      @if (!sidebarCollapsed()) {
+      <div class="admin-profile-pill">
+        <span class="profile-avatar">BF</span>
+        <div class="profile-meta">
+          <strong>Boluwatife Farinu</strong>
+          <small>Admin / Head of Retail</small>
+        </div>
+      </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Main Viewport Area -->
+  <div class="admin-main">
+    <!-- Top Bar -->
+    <header class="admin-topbar glass-header">
+      <div class="topbar-left">
+        <button
+          type="button"
+          class="cmd-trigger-btn"
+          (click)="showCmdPalette.set(true)"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Search command palette...</span>
+          <kbd class="kbd-pill">⌘K</kbd>
+        </button>
+
+        <span class="env-badge">● PROD · LAGOS VAULT</span>
+        <span class="dispatch-ticker"
+          >⚡ SAME-DAY CUT-OFF 1:00 PM · PAYSTACK & WEMA VERIFIED</span
+        >
+      </div>
+
+      <div class="topbar-right">
+        @if (pushService.canInstall()) {
+        <button
+          type="button"
+          class="pwa-install-pill-btn"
+          (click)="installPwa()"
+          title="Install Teepha Admin PWA"
+        >
+          <span>📲 Install App</span>
+        </button>
+        }
+
+        <button
+          type="button"
+          class="icon-action-btn"
+          [class.subscribed]="pushService.isSubscribed()"
+          (click)="togglePushNotifications()"
+          [title]="pushService.isSubscribed() ? 'Admin Push Alerts Active' : 'Enable Real-Time Order & Support Alerts'"
+          aria-label="Admin push notifications toggle"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          @if (pushService.isSubscribed()) {
+          <span class="push-dot-badge"></span>
+          }
+        </button>
+
+        <atelier-theme-toggle />
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-viewport">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<!-- Command Palette Modal -->
+@if (showCmdPalette()) {
+<atelier-command-palette (close)="showCmdPalette.set(false)" />
+}

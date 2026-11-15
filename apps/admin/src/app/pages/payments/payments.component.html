@@ -1,0 +1,357 @@
+<div class="admin-page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">TREASURY & GATEWAY RECONCILIATION</span>
+      <h1 class="page-title">
+        Payments Ledger, Virtual Accounts & Wire Verification
+      </h1>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn-secondary" (click)="exportLedgerCsv()">
+        ↓ Export Settlement CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- Financial Metrics -->
+  <div class="kpi-grid">
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Cumulative Gross Volume</span>
+      <div class="kpi-val price-display">
+        ₦{{ grossVolume().toLocaleString() }}
+      </div>
+      <span class="kpi-trend positive">All Nigerian gateways combined</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Gateway Switch Fees</span>
+      <div class="kpi-val price-display">
+        ₦{{ totalFees().toLocaleString() }}
+      </div>
+      <span class="kpi-trend neutral">Paystack (1.5%) · Wema (₦100 flat)</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Net Vault Settlement</span>
+      <div class="kpi-val price-display">
+        ₦{{ netSettlement().toLocaleString() }}
+      </div>
+      <span class="kpi-trend positive">Credited to Teepha Treasury</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Wires Awaiting 1-Click Verification</span>
+      <div class="kpi-val price-display font-bold text-amber">
+        {{ pendingVerificationCount() }}
+      </div>
+      <span
+        class="kpi-trend"
+        [class.positive]="pendingVerificationCount() === 0"
+      >
+        {{
+          pendingVerificationCount() > 0
+            ? 'Requires Treasury Confirmation'
+            : 'All Wires Reconciled'
+        }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Gateway Status Cards -->
+  <div class="gateways-grid">
+    <div class="gateway-card atelier-card">
+      <div class="gateway-header">
+        <span class="gateway-badge wema">WEMA BANK VIRTUAL</span>
+        <span class="status-live">● ACTIVE</span>
+      </div>
+      <div class="gw-volume price-display">
+        ₦{{ gatewayVolume('wema_virtual_account').toLocaleString() }}
+      </div>
+      <span class="gw-desc"
+        >Dynamic 30-min expiring accounts. Instant automated push
+        verification.</span
+      >
+    </div>
+
+    <div class="gateway-card atelier-card">
+      <div class="gateway-header">
+        <span class="gateway-badge paystack">PAYSTACK 3DS</span>
+        <span class="status-live">● ACTIVE</span>
+      </div>
+      <div class="gw-volume price-display">
+        ₦{{ gatewayVolume('paystack').toLocaleString() }}
+      </div>
+      <span class="gw-desc"
+        >Mastercard, Visa, Verve & Apple Pay with Nigerian 3DS OTP.</span
+      >
+    </div>
+
+    <div class="gateway-card atelier-card">
+      <div class="gateway-header">
+        <span class="gateway-badge flutterwave">FLUTTERWAVE USSD</span>
+        <span class="status-live">● ACTIVE</span>
+      </div>
+      <div class="gw-volume price-display">
+        ₦{{ gatewayVolume('flutterwave').toLocaleString() }}
+      </div>
+      <span class="gw-desc"
+        >Guaranty Trust *737#, Zenith *966# & bank debit rails.</span
+      >
+    </div>
+
+    <div class="gateway-card atelier-card">
+      <div class="gateway-header">
+        <span class="gateway-badge wire">DIRECT WIRE / MANUAL</span>
+        <span class="status-live">● REVIEW</span>
+      </div>
+      <div class="gw-volume price-display">
+        ₦{{ gatewayVolume('direct_bank_transfer').toLocaleString() }}
+      </div>
+      <span class="gw-desc"
+        >High-net-worth bridal bolts verified manually by admin desk.</span
+      >
+    </div>
+  </div>
+
+  <!-- Filters & Search Toolbar -->
+  <div class="table-toolbar atelier-card">
+    <div class="search-wrap">
+      <svg
+        class="search-icon"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by Payment Reference, Order #, or Patron name..."
+        [(ngModel)]="searchQuery"
+      />
+    </div>
+
+    <div class="filter-pills">
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedStatusFilter() === 'ALL'"
+        (click)="selectedStatusFilter.set('ALL')"
+      >
+        All Ledger
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedStatusFilter() === 'PENDING'"
+        (click)="selectedStatusFilter.set('PENDING')"
+      >
+        Pending Verification ({{ pendingVerificationCount() }})
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedStatusFilter() === 'PAID'"
+        (click)="selectedStatusFilter.set('PAID')"
+      >
+        Settled / Paid
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedStatusFilter() === 'REFUNDED'"
+        (click)="selectedStatusFilter.set('REFUNDED')"
+      >
+        Refunded
+      </button>
+    </div>
+  </div>
+
+  <!-- Transaction Ledger Table -->
+  <div class="table-card atelier-card">
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Reference & Order</th>
+            <th>Patron Details</th>
+            <th>Payment Gateway</th>
+            <th>Gross Paid</th>
+            <th>Switch Fee</th>
+            <th>Net Settlement</th>
+            <th>Status</th>
+            <th>Date & Verification</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pay of filteredPayments(); track pay.id) {
+            <tr>
+              <td>
+                <strong>{{ pay.reference }}</strong>
+                <div class="order-link">#{{ pay.orderNumber }}</div>
+              </td>
+              <td>
+                <div class="cust-details">
+                  <strong>{{ pay.customerName }}</strong>
+                  <small>{{ pay.customerPhone }}</small>
+                </div>
+              </td>
+              <td>
+                <span
+                  class="gw-pill"
+                  [class.wema]="pay.gateway === 'wema_virtual_account'"
+                  [class.paystack]="pay.gateway === 'paystack'"
+                  [class.flw]="pay.gateway === 'flutterwave'"
+                  [class.wire]="pay.gateway === 'direct_bank_transfer'"
+                >
+                  {{ getGatewayName(pay.gateway) }}
+                </span>
+              </td>
+              <td class="price-display font-bold">
+                ₦{{ pay.amount.toLocaleString() }}
+              </td>
+              <td class="price-display fee-text">
+                -₦{{ pay.fee.toLocaleString() }}
+              </td>
+              <td class="price-display net-text font-bold">
+                ₦{{ pay.netSettlement.toLocaleString() }}
+              </td>
+              <td>
+                <span
+                  class="status-pill"
+                  [class.paid]="pay.status === 'paid'"
+                  [class.pending]="pay.status === 'pending'"
+                  [class.refunded]="pay.status === 'refunded'"
+                >
+                  ● {{ pay.status | uppercase }}
+                </span>
+              </td>
+              <td>
+                <div class="date-meta">
+                  <span
+                    >{{ pay.createdAt | date: 'shortDate' }}
+                    {{ pay.createdAt | date: 'shortTime' }}</span
+                  >
+                  @if (pay.verifiedAt) {
+                    <small class="verified-tag">✓ Verified</small>
+                  }
+                </div>
+              </td>
+              <td>
+                <div class="action-btn-group">
+                  @if (pay.status === 'pending') {
+                    <button
+                      type="button"
+                      class="btn-primary mini-btn verify-btn"
+                      (click)="verifyPayment(pay.id)"
+                    >
+                      ✓ Settle Transfer
+                    </button>
+                  } @else if (pay.status === 'paid') {
+                    <button
+                      type="button"
+                      class="btn-ghost mini-btn"
+                      (click)="openDetailModal(pay)"
+                    >
+                      Audit Slip
+                    </button>
+                  } @else {
+                    <span class="refunded-label">Settled</span>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Audit Slip Modal -->
+@if (selectedPayment(); as p) {
+  <div class="modal-backdrop" (click)="selectedPayment.set(null)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">FINANCIAL RECONCILIATION SLIP</span>
+          <h3 class="modal-title">{{ p.reference }}</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="selectedPayment.set(null)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="receipt-card">
+          <div class="receipt-row">
+            <span>Associated Order:</span>
+            <strong>#{{ p.orderNumber }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Patron Name:</span>
+            <strong>{{ p.customerName }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Patron Phone:</span>
+            <strong>{{ p.customerPhone }}</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Settlement Gateway:</span>
+            <strong>{{ getGatewayName(p.gateway) }}</strong>
+          </div>
+          <div class="receipt-divider"></div>
+          <div class="receipt-row">
+            <span>Gross Amount Paid:</span>
+            <strong class="price-display"
+              >₦{{ p.amount.toLocaleString() }}</strong
+            >
+          </div>
+          <div class="receipt-row">
+            <span>Gateway Processing Fee:</span>
+            <span class="fee-text">-₦{{ p.fee.toLocaleString() }}</span>
+          </div>
+          <div class="receipt-row total-highlight">
+            <span>Net Credited to Vault:</span>
+            <strong class="price-display"
+              >₦{{ p.netSettlement.toLocaleString() }}</strong
+            >
+          </div>
+          <div class="receipt-row">
+            <span>Status:</span>
+            <span class="status-pill paid">● {{ p.status | uppercase }}</span>
+          </div>
+          <div class="receipt-row">
+            <span>Verification Timestamp:</span>
+            <small>{{ p.verifiedAt || p.createdAt }}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" (click)="refund(p.id)">
+          Issue Reversal
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="selectedPayment.set(null)"
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+}

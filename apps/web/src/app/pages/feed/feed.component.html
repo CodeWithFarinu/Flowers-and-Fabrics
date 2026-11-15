@@ -1,0 +1,167 @@
+<div class="feed-page-container">
+  <!-- High-Fashion Uncommon Editorial Hero Slider -->
+  <atelier-hero-slider />
+
+  <!-- Lagos Runway & Client Stories Highlight Rail -->
+  <atelier-stories-rail />
+
+  <!-- Collections Horizontal Sliding Rail -->
+  <atelier-collections-rail />
+
+  <!-- Classy Professional Department Bar -->
+  <section class="department-filter-bar">
+    <div class="dept-left">
+      <span class="section-kicker"
+        >⚜ ENDLESS PINTEREST DISCOVERY · "GET A WORTH FOR UR CLASS" ⚜</span
+      >
+      <h2 class="section-heading">All Luxury Curations</h2>
+    </div>
+
+    <div class="dept-nav-pills">
+      <button
+        type="button"
+        class="dept-pill"
+        [class.active]="productStore.categoryFilter() === 'all'"
+        (click)="onSelectCategory('all')"
+      >
+        <span class="pill-rare-icon">❖</span>
+        All Curations
+      </button>
+      <button
+        type="button"
+        class="dept-pill"
+        [class.active]="productStore.categoryFilter() === 'fabrics'"
+        (click)="onSelectCategory('fabrics')"
+      >
+        <span class="pill-rare-icon">✂</span>
+        Senator & Swiss Lace
+      </button>
+      <button
+        type="button"
+        class="dept-pill"
+        [class.active]="productStore.categoryFilter() === 'accessories'"
+        (click)="onSelectCategory('accessories')"
+      >
+        <span class="pill-rare-icon">⏱</span>
+        Cufflinks & Horology
+      </button>
+      <button
+        type="button"
+        class="dept-pill"
+        [class.active]="productStore.categoryFilter() === 'sneakers'"
+        (click)="onSelectCategory('sneakers')"
+      >
+        <span class="pill-rare-icon">◈</span>
+        Verified Footwear
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-feed-btn"
+      (click)="onRefresh()"
+      title="Refresh dynamic discovery feed"
+    >
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+      >
+        <path d="M23 4v6h-6"></path>
+        <path d="M1 20v-6h6"></path>
+        <path
+          d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+        ></path>
+      </svg>
+      Re-Seed
+    </button>
+  </section>
+
+  <!-- True Pinterest Multi-Column Masonry Grid -->
+  <section class="pinterest-masonry-feed">
+    @for (item of productStore.visibleFeedItems(); track item.id) {
+      @if (item.type === 'product' && item.product) {
+        <div class="feed-item-cell">
+          <atelier-product-card
+            [product]="item.product"
+            [aspectRatio]="
+              item.aspectRatio === '16:9'
+                ? '16 / 9'
+                : item.aspectRatio === '4:3'
+                  ? '4 / 3'
+                  : item.aspectRatio === '1:1'
+                    ? '1 / 1'
+                    : item.aspectRatio === '3:4'
+                      ? '3 / 4'
+                      : item.aspectRatio === '2:3'
+                        ? '2 / 3'
+                        : '4 / 5'
+            "
+          />
+        </div>
+      } @else if (item.type === 'ai_teaser') {
+        <div class="feed-item-cell">
+          <div class="teaser-card atelier-card">
+            <div class="teaser-media">
+              <img [src]="item.imageUrl" alt="AI Style Studio" loading="lazy" />
+              <span class="teaser-badge">✦ AI STYLE STUDIO</span>
+            </div>
+            <div class="teaser-body">
+              <span class="teaser-eyebrow">LAGOS BESPOKE INTELLIGENCE</span>
+              <h3 class="teaser-title">{{ item.title }}</h3>
+              <p class="teaser-sub">{{ item.subtitle }}</p>
+              <a routerLink="/studio" class="btn-primary full-w-cta">
+                Generate Garment Preview ✦
+              </a>
+            </div>
+          </div>
+        </div>
+      } @else if (item.type === 'ugc_look') {
+        <div class="feed-item-cell">
+          <div class="ugc-card atelier-card">
+            <div class="ugc-media">
+              <img [src]="item.imageUrl" alt="Styled in Lagos" loading="lazy" />
+              <span class="ugc-badge">STYLED IN VICTORIA ISLAND</span>
+            </div>
+            <div class="ugc-body">
+              <span class="ugc-eyebrow">CLIENT LOOKBOOK</span>
+              <h3 class="ugc-title">{{ item.title }}</h3>
+              <p class="ugc-desc">{{ item.subtitle }}</p>
+              <div class="ugc-footer">
+                <span class="tailor-credit">Bespoke Senator Cut</span>
+                <a
+                  routerLink="/product/midnight-italian-cashmere-senator"
+                  class="shop-fabric-link"
+                >
+                  Shop 160s Fabric →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </section>
+
+  <!-- Infinite Scroll Sentinel & Batch Preloader -->
+  <div #infiniteSentinel class="sentinel-anchor"></div>
+
+  @if (productStore.isLoadingNextBatch()) {
+    <div class="luxury-batch-preloader">
+      <div class="preloader-spinner-ring"></div>
+      <span class="preloader-text"
+        >Curating next set of luxury fabrics & objets...</span
+      >
+    </div>
+  } @else if (!productStore.hasMoreFeedItems()) {
+    <div class="end-of-catalog-pill">
+      <span
+        >You have explored all currently available curations in this
+        department.</span
+      >
+    </div>
+  }
+</div>

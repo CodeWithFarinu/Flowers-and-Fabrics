@@ -1,1 +1,44 @@
-/* You can add global styles to this file, and also import other style files */
+/* Core Ionic CSS */
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
+
+/* Teepha Flowers and Fabrics Luxe Tokens */
+@import '../../../libs/shared/ui-tokens/src/lib/tokens.css';
+
+/* Mobile safe area and typography resets */
+:root {
+  --ion-background-color: var(--bg);
+  --ion-text-color: var(--text);
+  --ion-toolbar-background: var(--bg-elevated);
+  --ion-toolbar-color: var(--text);
+  --ion-tab-bar-background: var(--bg-elevated);
+  --ion-tab-bar-color: var(--text-muted);
+  --ion-tab-bar-color-selected: var(--text);
+  --ion-item-background: var(--bg-elevated);
+  --ion-card-background: var(--bg-elevated);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+ion-content {
+  --background: var(--bg);
+  --color: var(--text);
+}
+
+ion-toolbar {
+  --border-color: var(--border);
+}
+
+ion-tab-bar {
+  border-top: 1px solid var(--border);
+}

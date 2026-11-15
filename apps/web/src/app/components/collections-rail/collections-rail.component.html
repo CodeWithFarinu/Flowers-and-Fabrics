@@ -1,0 +1,65 @@
+<section class="collections-rail-section">
+  <div class="rail-header">
+    <div class="header-left">
+      <span class="curated-label">CURATED DEPARTMENTS & EDITS</span>
+      <h2 class="rail-title">Explore by Exclusive Collections</h2>
+    </div>
+    <div class="rail-nav-arrows">
+      <button
+        type="button"
+        class="arrow-btn"
+        (click)="scrollRail('left')"
+        aria-label="Scroll left"
+      >
+        ←
+      </button>
+      <button
+        type="button"
+        class="arrow-btn"
+        (click)="scrollRail('right')"
+        aria-label="Scroll right"
+      >
+        →
+      </button>
+    </div>
+  </div>
+
+  <div class="rail-scroll-track" #railTrack>
+    @for (item of collections; track item.slug) {
+      <a
+        [routerLink]="['/collections', item.slug]"
+        class="collection-rail-card"
+      >
+        <div class="card-bg-wrap">
+          <img
+            [src]="item.heroImage"
+            [alt]="item.title"
+            loading="lazy"
+            class="card-img"
+          />
+          <div class="card-scrim"></div>
+        </div>
+
+        <div class="card-info">
+          <span class="search-sample-tag">
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            #{{ item.tag || 'bespoke' }}
+          </span>
+          <h3 class="collection-title">{{ item.title }}</h3>
+          <p class="collection-sub">{{ item.subtitle }}</p>
+          <span class="view-collection-link">View Collection →</span>
+        </div>
+      </a>
+    }
+  </div>
+</section>

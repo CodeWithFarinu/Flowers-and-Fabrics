@@ -1,0 +1,118 @@
+<div class="rewards-container">
+  <div class="rewards-hero atelier-card">
+    <span class="hero-eyebrow">✦ TEEPHA CUSTOMER GUILD</span>
+    <h1 class="hero-title">Loyalty, Heritage & Privileges</h1>
+    <p class="hero-sub">
+      Every yard of fabric and curated accessory purchased elevates your status
+      and unlocks bespoke perks.
+    </p>
+
+    <!-- Current Tier Card -->
+    <div class="status-summary-box">
+      <div class="tier-badge-large">
+        <span class="tier-crown">★</span>
+        <span class="tier-name"
+          >{{ authStore.loyaltyTier() | uppercase }} TIER</span
+        >
+      </div>
+
+      <div class="points-balance-wrap price-display">
+        <span class="points-num">{{
+          authStore.loyaltyPoints().toLocaleString()
+        }}</span>
+        <span class="points-lbl"
+          >TEEPHA POINTS (Value: ₦{{
+            (authStore.loyaltyPoints() * 10).toLocaleString()
+          }})</span
+        >
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-labels">
+          <span>Current: {{ authStore.loyaltyTier() }}</span>
+          <span
+            >Next Tier: ₦{{
+              (authStore.tierNextThreshold() || 50000).toLocaleString()
+            }}
+            Spend</span
+          >
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: 68%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tiers Showcase Grid -->
+  <h2 class="section-title">The Four Guild Tiers</h2>
+  <div class="tiers-grid">
+    <!-- Tier 1: Thread -->
+    <div
+      class="tier-card atelier-card"
+      [class.current]="authStore.loyaltyTier() === 'Thread'"
+    >
+      <div class="tier-card-header">
+        <span class="tier-rank">TIER 01</span>
+        <h3 class="tier-headline">Thread</h3>
+        <span class="spend-threshold">Entry upon First Purchase</span>
+      </div>
+      <ul class="perks-list">
+        <li>✓ 1 Free AI Style Studio preview token</li>
+        <li>✓ Access to public fabric drops</li>
+        <li>✓ Standard nationwide dispatch</li>
+      </ul>
+    </div>
+
+    <!-- Tier 2: Stitch -->
+    <div
+      class="tier-card atelier-card"
+      [class.current]="authStore.loyaltyTier() === 'Stitch'"
+    >
+      <div class="tier-card-header">
+        <span class="tier-rank">TIER 02</span>
+        <h3 class="tier-headline">Stitch</h3>
+        <span class="spend-threshold">₦150,000 Annual Spend</span>
+      </div>
+      <ul class="perks-list">
+        <li>✓ 5% Bonus points on all yardage</li>
+        <li>✓ 2 Free AI Style tokens per month</li>
+        <li>✓ Priority cutting desk allocation</li>
+      </ul>
+    </div>
+
+    <!-- Tier 3: Tailor -->
+    <div class="tier-card atelier-card current">
+      <div class="current-tag">YOUR CURRENT STATUS</div>
+      <div class="tier-card-header">
+        <span class="tier-rank">TIER 03</span>
+        <h3 class="tier-headline">Tailor</h3>
+        <span class="spend-threshold">₦350,000 Annual Spend</span>
+      </div>
+      <ul class="perks-list">
+        <li>★ Complimentary Lagos Same-Day Delivery</li>
+        <li>★ 10% Bonus points redemption value</li>
+        <li>★ 5 AI Style Studio tokens per month</li>
+        <li>★ Dedicated WhatsApp Concierge for Bridal & Aso-Ebi</li>
+      </ul>
+    </div>
+
+    <!-- Tier 4: Atelier -->
+    <div
+      class="tier-card atelier-card"
+      [class.current]="authStore.loyaltyTier() === 'Atelier'"
+    >
+      <div class="tier-card-header">
+        <span class="tier-rank">TIER 04 (INVITE / VIP)</span>
+        <h3 class="tier-headline">Teepha Sovereign Member</h3>
+        <span class="spend-threshold">₦1,000,000+ Annual Spend</span>
+      </div>
+      <ul class="perks-list">
+        <li>✦ 24-Hour early access to limited sneaker drops</li>
+        <li>✦ Private viewing suite at Ipaja Flagship Store</li>
+        <li>✦ Unlimited AI Style Studio simulations</li>
+        <li>✦ Complimentary bespoke tailoring consultations</li>
+      </ul>
+    </div>
+  </div>
+</div>

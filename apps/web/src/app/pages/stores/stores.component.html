@@ -1,0 +1,1006 @@
+<div class="discover-feed-page">
+  <!-- Top Luxury Header -->
+  <header class="feed-header-banner">
+    <div class="feed-header-inner">
+      <div class="feed-badge-pill">
+        <span class="pulse-dot"></span>
+        <span>LIVE SHOWROOM LOOKBOOK & PRODUCT FEED</span>
+      </div>
+      <h1 class="feed-main-title">Discover Curations & Collections</h1>
+      <p class="feed-sub-title">
+        Real-time fabric arrivals, master tailor cuts, and bridal floral
+        arrangements at
+        <strong>Teepha Flowers & Fabrics Fashion Store Lagos</strong> (Shagari
+        Estate, Ipaja).
+      </p>
+    </div>
+  </header>
+
+  <!-- Horizontal Curated Collections Rail (Suggested For You / Status Previews) -->
+  <section class="curated-collections-section">
+    <div class="section-heading-row">
+      <div class="heading-left">
+        <span class="heading-gold-crest">⚜</span>
+        <h2 class="section-title">Curated Collections For You</h2>
+      </div>
+      <span class="collection-hint-pill">Tap to open Story Status</span>
+    </div>
+
+    <div class="collections-horizontal-track">
+      @for (col of curatedCollections; track col.id) {
+        <div class="collection-story-card" (click)="openStory(col)">
+          <div class="story-ring-wrapper">
+            <div class="story-avatar-squircle">
+              @if (col.videoPreview) {
+                <video
+                  #collectionVideo
+                  [src]="col.videoPreview"
+                  class="story-preview-video"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                ></video>
+              } @else {
+                <img
+                  [src]="col.coverImage"
+                  [alt]="col.title"
+                  class="story-cover-img"
+                  loading="lazy"
+                />
+              }
+              <div class="story-play-indicator">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <span class="story-card-title">{{ col.title }}</span>
+          <span class="story-card-meta">{{ col.itemCount }} Curations</span>
+          <button type="button" class="btn-view-story">View Story</button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Main Infinite Product Posts Feed -->
+  <main class="feed-posts-container">
+    <div class="posts-responsive-grid">
+      @for (post of visibleFeedPosts(); track post.id; let idx = $index) {
+        <!-- Interspersed Vertical Scroll Showcase Section 1: Services & Programs (After post 4) -->
+        @if (idx === 4) {
+          <section class="vertical-scroll-showcase-container">
+            <header class="showcase-header-row">
+              <div class="showcase-header-left">
+                <span class="showcase-gold-crest">✦</span>
+                <div class="showcase-title-group">
+                  <h3 class="showcase-main-title">
+                    Concierge Services & Guild Programs
+                  </h3>
+                  <span class="showcase-scroll-hint"
+                    >Scroll vertically inside ↕</span
+                  >
+                </div>
+              </div>
+              <span class="showcase-count-pill"
+                >{{ verticalAppServices.length }} Services</span
+              >
+            </header>
+
+            <div class="vertical-snap-scroll-track">
+              @for (ad of verticalAppServices; track ad.id) {
+                <div
+                  class="vertical-slide-card"
+                  [style.background-image]="
+                    'linear-gradient(to top, rgba(0,0,0,0.92) 20%, rgba(0,0,0,0.45) 100%), url(' +
+                    ad.bgImage +
+                    ')'
+                  "
+                >
+                  <div class="v-card-badge-row">
+                    <span class="v-badge-pill">{{ ad.badge }}</span>
+                  </div>
+                  <div class="v-card-body">
+                    <h4 class="v-slide-title">{{ ad.title }}</h4>
+                    <p class="v-slide-desc">{{ ad.desc }}</p>
+                    <div class="v-stats-row">
+                      @for (st of ad.stats; track st.label) {
+                        <div class="v-stat-item">
+                          <span class="v-stat-val">{{ st.val }}</span>
+                          <span class="v-stat-lbl">{{ st.label }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="v-card-footer">
+                    @if (ad.isExternal) {
+                      <a
+                        [href]="ad.actionUrl"
+                        target="_blank"
+                        class="btn-v-action external-wa"
+                      >
+                        {{ ad.actionLabel }}
+                      </a>
+                    } @else {
+                      <a [routerLink]="ad.actionUrl" class="btn-v-action">
+                        {{ ad.actionLabel }}
+                      </a>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Interspersed Vertical Scroll Showcase Section 2: Bespoke Product Flash Spotlights (After post 14) -->
+        @if (idx === 14) {
+          <section class="vertical-scroll-showcase-container spotlights-theme">
+            <header class="showcase-header-row">
+              <div class="showcase-header-left">
+                <span class="showcase-gold-crest">⚜</span>
+                <div class="showcase-title-group">
+                  <h3 class="showcase-main-title">
+                    Bespoke Product Flash Spotlights
+                  </h3>
+                  <span class="showcase-scroll-hint"
+                    >Scroll vertically inside ↕</span
+                  >
+                </div>
+              </div>
+              <span class="showcase-count-pill"
+                >{{ verticalProductSpotlights.length }} Highlights</span
+              >
+            </header>
+
+            <div class="vertical-snap-scroll-track">
+              @for (spot of verticalProductSpotlights; track spot.id) {
+                <div
+                  class="vertical-slide-card"
+                  [style.background-image]="
+                    'linear-gradient(to top, rgba(0,0,0,0.92) 20%, rgba(0,0,0,0.45) 100%), url(' +
+                    spot.bgImage +
+                    ')'
+                  "
+                >
+                  <div class="v-card-badge-row">
+                    <span class="v-badge-pill gold-badge">{{
+                      spot.badge
+                    }}</span>
+                  </div>
+                  <div class="v-card-body">
+                    <h4 class="v-slide-title">{{ spot.title }}</h4>
+                    <p class="v-slide-desc">{{ spot.desc }}</p>
+                    <div class="v-stats-row">
+                      @for (st of spot.stats; track st.label) {
+                        <div class="v-stat-item">
+                          <span class="v-stat-val">{{ st.val }}</span>
+                          <span class="v-stat-lbl">{{ st.label }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="v-card-footer">
+                    <a
+                      [routerLink]="spot.actionUrl"
+                      class="btn-v-action gold-action"
+                    >
+                      {{ spot.actionLabel }}
+                    </a>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Standard Instagram-Style Product Post Card -->
+        <article class="feed-post-card atelier-card">
+          <!-- 1. Post Header -->
+          <header class="post-header">
+            <div class="author-profile-group">
+              <div class="author-avatar-badge">
+                <span>{{ post.avatarText }}</span>
+              </div>
+              <div class="author-text-meta">
+                <div class="author-name-row">
+                  <span class="author-brand-line">{{ post.brandLine }}</span>
+                  @if (post.isVerified) {
+                    <svg
+                      class="verified-check-svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="#3897f0"
+                    >
+                      <path
+                        d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7l-4.1-4.1 1.4-1.4 2.7 2.7 6.7-6.7 1.4 1.4-8.1 8.1z"
+                      />
+                    </svg>
+                  }
+                </div>
+                <div class="author-subtext">
+                  <span>{{ post.location }}</span>
+                  <span class="dot-separator">•</span>
+                  <span>{{ post.timeAgo }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Post Options Button -->
+            <button
+              type="button"
+              class="post-options-btn"
+              (click)="sharePost(post)"
+              title="Share or copy link"
+              aria-label="Post options"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <circle cx="12" cy="12" r="2"></circle>
+                <circle cx="19" cy="12" r="2"></circle>
+                <circle cx="5" cy="12" r="2"></circle>
+              </svg>
+            </button>
+          </header>
+
+          <!-- 2. Media Viewport (Carousel or Video or Image) -->
+          <div class="post-media-stage">
+            @if (post.mediaType === 'carousel') {
+              <!-- Multi-Content Carousel Slider (Instagram Style) -->
+              <div class="carousel-viewport">
+                <div
+                  class="carousel-track"
+                  [style.transform]="
+                    'translateX(-' + getCarouselIndex(post.id) * 100 + '%)'
+                  "
+                >
+                  @for (
+                    img of post.mediaItems;
+                    track img;
+                    let imgIdx = $index
+                  ) {
+                    <div class="carousel-slide">
+                      <img
+                        [src]="img"
+                        [alt]="post.title"
+                        class="post-main-img"
+                        loading="lazy"
+                      />
+                    </div>
+                  }
+                </div>
+
+                <!-- Left Navigation Arrow -->
+                @if (
+                  post.mediaItems.length > 1 && getCarouselIndex(post.id) > 0
+                ) {
+                  <button
+                    type="button"
+                    class="carousel-arrow arrow-prev"
+                    (click)="prevSlide(post, $event)"
+                    aria-label="Previous image"
+                  >
+                    ‹
+                  </button>
+                }
+
+                <!-- Right Navigation Arrow -->
+                @if (
+                  post.mediaItems.length > 1 &&
+                  getCarouselIndex(post.id) < post.mediaItems.length - 1
+                ) {
+                  <button
+                    type="button"
+                    class="carousel-arrow arrow-next"
+                    (click)="nextSlide(post, $event)"
+                    aria-label="Next image"
+                  >
+                    ›
+                  </button>
+                }
+
+                <!-- Pagination Dots (Instagram style) -->
+                @if (post.mediaItems.length > 1) {
+                  <div class="carousel-dots-indicator">
+                    @for (
+                      dot of post.mediaItems;
+                      track $index;
+                      let dotIdx = $index
+                    ) {
+                      <span
+                        class="dot"
+                        [class.active]="dotIdx === getCarouselIndex(post.id)"
+                        (click)="setSlide(post, dotIdx, $event)"
+                      ></span>
+                    }
+                  </div>
+                }
+
+                <!-- Slide Counter Tag (e.g. 1/3) -->
+                @if (post.mediaItems.length > 1) {
+                  <div class="carousel-counter-badge">
+                    {{ getCarouselIndex(post.id) + 1 }}/{{
+                      post.mediaItems.length
+                    }}
+                  </div>
+                }
+              </div>
+            } @else if (post.mediaType === 'video' && post.videoUrl) {
+              <!-- HTML5 Video Post with Auto-play on Scroll -->
+              <div
+                class="video-post-stage"
+                (click)="toggleVideoPlay(postVideo, $event)"
+              >
+                <video
+                  #postVideo
+                  [src]="post.videoUrl"
+                  [poster]="post.mediaItems[0]"
+                  class="post-main-video"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                ></video>
+
+                <!-- Audio Unmute Toggle Button -->
+                <button
+                  type="button"
+                  class="video-audio-toggle-btn"
+                  (click)="toggleAudio($event)"
+                  aria-label="Toggle audio"
+                  [title]="isMuted() ? 'Tap to unmute' : 'Tap to mute'"
+                >
+                  @if (isMuted()) {
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polygon
+                        points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+                      ></polygon>
+                      <line x1="23" y1="9" x2="17" y2="15"></line>
+                      <line x1="17" y1="9" x2="23" y2="15"></line>
+                    </svg>
+                  } @else {
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polygon
+                        points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+                      ></polygon>
+                      <path
+                        d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
+                      ></path>
+                    </svg>
+                  }
+                </button>
+              </div>
+            } @else {
+              <!-- Single High-Res Image Post -->
+              <div class="single-image-stage">
+                <img
+                  [src]="post.mediaItems[0]"
+                  [alt]="post.title"
+                  class="post-main-img"
+                  loading="lazy"
+                />
+              </div>
+            }
+          </div>
+
+          <!-- 3. Instagram Interaction Action Bar -->
+          <div class="post-action-bar">
+            <div class="actions-left-group">
+              <!-- Heart (Like) Button -->
+              <button
+                type="button"
+                class="action-btn like-btn"
+                [class.liked]="post.isLiked"
+                (click)="toggleLike(post)"
+                aria-label="Like post"
+              >
+                @if (post.isLiked) {
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="#ed4956"
+                    stroke="#ed4956"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    ></path>
+                  </svg>
+                } @else {
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    ></path>
+                  </svg>
+                }
+              </button>
+
+              <!-- Comment Button -->
+              <button
+                type="button"
+                class="action-btn comment-btn"
+                (click)="openComments(post)"
+                aria-label="View comments"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                  ></path>
+                </svg>
+              </button>
+
+              <!-- Repost Icon -->
+              <button
+                type="button"
+                class="action-btn repost-btn"
+                (click)="toggleRepost(post)"
+                aria-label="Repost"
+              >
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M17 1l4 4-4 4"></path>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                  <path d="M7 23l-4-4 4-4"></path>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                </svg>
+              </button>
+
+              <!-- Direct Share Button (Paper Plane) -->
+              <button
+                type="button"
+                class="action-btn share-plane-btn"
+                (click)="sharePost(post)"
+                aria-label="Share post"
+              >
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Bookmark / Wishlist Button -->
+            <button
+              type="button"
+              class="action-btn bookmark-btn"
+              [class.saved]="post.isBookmarked"
+              (click)="toggleBookmark(post)"
+              aria-label="Save piece"
+            >
+              @if (post.isBookmarked) {
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="#d97706"
+                  stroke="#d97706"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                  ></path>
+                </svg>
+              } @else {
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                  ></path>
+                </svg>
+              }
+            </button>
+          </div>
+
+          <!-- Likes Count Display -->
+          <div class="post-likes-count">
+            <strong>{{ post.likesCount | number }} likes</strong>
+          </div>
+
+          <!-- 4. Conversion & Product Actions Row -->
+          <div class="post-conversion-row">
+            <!-- View Product Button -->
+            <a
+              [routerLink]="['/product', post.slug]"
+              class="btn-view-product"
+              title="View full piece details, yardage options, and specs"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>View Product</span>
+            </a>
+
+            <!-- Classic WhatsApp Inquiry Button with prefilled context -->
+            <a
+              [href]="getWhatsAppInquiryUrl(post)"
+              target="_blank"
+              class="btn-wa-classic-inquiry"
+              title="Chat with showroom stylist regarding this piece"
+            >
+              <svg
+                class="wa-classic-svg"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.44 19.64L5.27 16.61L5.07 16.29C4.24 14.97 3.8 13.47 3.8 11.91C3.8 7.37 7.5 3.67 12.04 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.05 20.15ZM16.57 14.41C16.32 14.29 15.1 13.69 14.87 13.61C14.65 13.52 14.48 13.48 14.32 13.73C14.15 13.97 13.68 14.53 13.54 14.69C13.39 14.85 13.25 14.87 13 14.75C12.75 14.63 11.96 14.37 11.02 13.53C10.29 12.88 9.79 12.07 9.65 11.82C9.5 11.58 9.63 11.44 9.76 11.32C9.87 11.21 10.01 11.03 10.13 10.89C10.26 10.74 10.3 10.64 10.38 10.48C10.46 10.31 10.42 10.17 10.36 10.05C10.3 9.93 9.8 8.71 9.6 8.21C9.4 7.73 9.2 7.79 9.05 7.78C8.91 7.78 8.75 7.77 8.58 7.77C8.42 7.77 8.15 7.83 7.92 8.08C7.7 8.32 7.07 8.91 7.07 10.12C7.07 11.33 7.95 12.49 8.08 12.65C8.2 12.82 9.81 15.3 12.28 16.36C12.87 16.61 13.32 16.76 13.68 16.88C14.27 17.06 14.81 17.04 15.24 16.97C15.72 16.9 16.71 16.37 16.91 15.79C17.12 15.21 17.12 14.72 17.06 14.61C17 14.5 16.83 14.43 16.57 14.41Z"
+                />
+              </svg>
+              <span>Inquire</span>
+            </a>
+
+            <!-- Quick Add to Bag -->
+            <button
+              type="button"
+              class="btn-quick-bag-add"
+              (click)="quickAddToBag(post, $event)"
+              title="Add 4 units to bag"
+            >
+              <span>+ Bag</span>
+            </button>
+          </div>
+
+          <!-- 5. Rich Caption & Expandable Description -->
+          <div class="post-caption-box">
+            <span class="caption-author-handle">{{ post.brandHandle }}</span>
+            <span class="caption-text">
+              @if (isCaptionExpanded(post.id)) {
+                {{ post.caption }}
+              } @else {
+                {{ post.caption.slice(0, 110) }}
+                @if (post.caption.length > 110) {
+                  ...
+                }
+              }
+            </span>
+            @if (post.caption.length > 110) {
+              <button
+                type="button"
+                class="btn-caption-toggle"
+                (click)="toggleCaption(post.id, $event)"
+              >
+                {{ isCaptionExpanded(post.id) ? 'less' : 'more' }}
+              </button>
+            }
+
+            <!-- Direct Text Link to Product Details Page -->
+            <div class="view-product-text-row">
+              <a
+                [routerLink]="['/product', post.slug]"
+                class="view-product-link"
+              >
+                <span>View Product Details & Precision Tailoring</span>
+                <span class="link-arrow">→</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Fabric Specifications Tag Pills -->
+          @if (post.fabricSpecs) {
+            <div class="fabric-specs-pills">
+              <span class="spec-pill">⚜ {{ post.fabricSpecs.material }}</span>
+              <span class="spec-pill">📐 {{ post.fabricSpecs.width }}</span>
+              <span class="spec-pill">✨ {{ post.fabricSpecs.occasion }}</span>
+            </div>
+          }
+
+          <!-- Hashtags -->
+          <div class="post-hashtags-row">
+            @for (tag of post.tags; track tag) {
+              <span class="hashtag-link">{{ tag }}</span>
+            }
+          </div>
+
+          <!-- View Comments Trigger -->
+          @if (post.commentsCount > 0) {
+            <button
+              type="button"
+              class="btn-view-all-comments"
+              (click)="openComments(post)"
+            >
+              View all {{ post.commentsCount }} comments
+            </button>
+          }
+
+          <!-- Timestamp -->
+          <div class="post-timestamp-footer">
+            <span
+              >{{ post.timeAgo | uppercase }} AGO · PHYSICAL STORE
+              EXCLUSIVE</span
+            >
+          </div>
+        </article>
+      }
+    </div>
+
+    <!-- Infinite Scroll Sentinel & Preloader -->
+    <div #infiniteSentinel class="infinite-sentinel">
+      @if (isLoadingMore()) {
+        <div class="infinite-loading-pulse">
+          <div class="pulse-ring"></div>
+          <span class="loading-label"
+            >Loading next curations from Ipaja showroom...</span
+          >
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- Instagram-Style Comments Modal / Drawer -->
+  @if (activeCommentPost()) {
+    <div class="comments-modal-backdrop" (click)="closeComments()">
+      <div
+        class="comments-drawer-panel atelier-card"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Drawer Header -->
+        <header class="comments-header">
+          <div class="header-handle-bar"></div>
+          <div class="header-content-row">
+            <span class="comments-title">Comments</span>
+            <button
+              type="button"
+              class="btn-close-comments"
+              (click)="closeComments()"
+            >
+              ✕
+            </button>
+          </div>
+        </header>
+
+        <!-- Pinned Author Description at Top -->
+        <div class="pinned-author-caption-block">
+          <div class="commenter-avatar">
+            <span>{{ activeCommentPost()!.avatarText }}</span>
+          </div>
+          <div class="caption-comment-body">
+            <div class="comment-author-line">
+              <span class="author-name">{{
+                activeCommentPost()!.brandHandle
+              }}</span>
+              <svg
+                class="verified-check-svg"
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="#3897f0"
+              >
+                <path
+                  d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7l-4.1-4.1 1.4-1.4 2.7 2.7 6.7-6.7 1.4 1.4-8.1 8.1z"
+                />
+              </svg>
+              <span class="comment-time">{{
+                activeCommentPost()!.timeAgo
+              }}</span>
+            </div>
+            <p class="comment-text-content">
+              {{ activeCommentPost()!.caption }}
+            </p>
+          </div>
+        </div>
+
+        <div class="comments-divider"></div>
+
+        <!-- Scrollable Customer Comments List -->
+        <div class="comments-scroll-stream">
+          @for (c of activeCommentPost()!.comments; track c.id) {
+            <div class="comment-item-row">
+              <img
+                [src]="c.avatar"
+                [alt]="c.user"
+                class="commenter-avatar-img"
+              />
+              <div class="comment-content-main">
+                <div class="comment-author-line">
+                  <span class="author-name">{{ c.handle }}</span>
+                  <span class="comment-time">{{ c.time }}</span>
+                </div>
+                <p class="comment-text-content">{{ c.text }}</p>
+                <div class="comment-reply-meta">
+                  <span>{{ c.likes }} likes</span>
+                  <button type="button" class="btn-reply-text">Reply</button>
+                </div>
+              </div>
+
+              <!-- Comment Like Heart -->
+              <button
+                type="button"
+                class="comment-heart-btn"
+                [class.active]="c.isLiked"
+                (click)="toggleCommentLike(c)"
+                aria-label="Like comment"
+              >
+                @if (c.isLiked) {
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="#ed4956"
+                  >
+                    <path
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                    />
+                  </svg>
+                } @else {
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    ></path>
+                  </svg>
+                }
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Quick Emoji Reaction Pills -->
+        <div class="quick-emoji-row">
+          <button
+            type="button"
+            class="emoji-chip"
+            (click)="addEmojiReaction('❤️')"
+          >
+            ❤️
+          </button>
+          <button
+            type="button"
+            class="emoji-chip"
+            (click)="addEmojiReaction('🔥')"
+          >
+            🔥
+          </button>
+          <button
+            type="button"
+            class="emoji-chip"
+            (click)="addEmojiReaction('👏')"
+          >
+            👏
+          </button>
+          <button
+            type="button"
+            class="emoji-chip"
+            (click)="addEmojiReaction('✨')"
+          >
+            ✨
+          </button>
+          <button
+            type="button"
+            class="emoji-chip"
+            (click)="addEmojiReaction('😍')"
+          >
+            😍
+          </button>
+          <button
+            type="button"
+            class="emoji-chip"
+            (click)="addEmojiReaction('⚜')"
+          >
+            ⚜
+          </button>
+        </div>
+
+        <!-- Post Comment Form Footer -->
+        <form (submit)="addComment($event)" class="comment-input-footer">
+          <div class="current-user-dot">TF</div>
+          <input
+            type="text"
+            [(ngModel)]="newCommentText"
+            name="newCommentInput"
+            placeholder="Add a comment as customer..."
+            class="comment-text-input"
+            autocomplete="off"
+          />
+          <button
+            type="submit"
+            class="btn-submit-comment"
+            [disabled]="!newCommentText.trim()"
+          >
+            Post
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Status / Story View Full-Screen Modal -->
+  @if (activeStory()) {
+    <div class="story-modal-backdrop" (click)="closeStory()">
+      <div
+        class="story-stage-viewport"
+        (click)="$event.stopPropagation()"
+        (mousedown)="pauseStory()"
+        (mouseup)="resumeStory()"
+        (touchstart)="pauseStory()"
+        (touchend)="resumeStory()"
+      >
+        <!-- Top Segmented Progress Bars -->
+        <div class="story-progress-segments">
+          @for (s of activeStory()!.slides; track s.url; let sIdx = $index) {
+            <div class="segment-track">
+              <div
+                class="segment-fill"
+                [class.passed]="sIdx < storySlideIndex()"
+                [class.current]="sIdx === storySlideIndex()"
+              ></div>
+            </div>
+          }
+        </div>
+
+        <!-- Story Header -->
+        <header class="story-header-bar">
+          <div class="story-author-info">
+            <div class="story-crest">TF</div>
+            <div class="story-meta-lines">
+              <span class="story-title-line">{{ activeStory()!.title }}</span>
+              <span class="story-sub-line"
+                >Teepha Collection Status • 2h ago</span
+              >
+            </div>
+          </div>
+          <div class="story-header-actions">
+            <button
+              type="button"
+              class="btn-story-close"
+              (click)="closeStory()"
+            >
+              ✕
+            </button>
+          </div>
+        </header>
+
+        <!-- Current Story Slide Media -->
+        <div class="story-active-media-box">
+          @let curSlide = activeStory()!.slides[storySlideIndex()];
+          @if (curSlide.type === 'video') {
+            <video
+              [src]="curSlide.url"
+              class="story-full-media"
+              autoplay
+              muted
+              playsinline
+              loop
+            ></video>
+          } @else {
+            <img
+              [src]="curSlide.url"
+              [alt]="curSlide.title"
+              class="story-full-media"
+            />
+          }
+
+          <!-- Tap Navigators -->
+          <div
+            class="story-tap-zone zone-left"
+            (click)="prevStorySlide()"
+          ></div>
+          <div
+            class="story-tap-zone zone-right"
+            (click)="nextStorySlide()"
+          ></div>
+        </div>
+
+        <!-- Story Bottom Information & Action Bar -->
+        <footer class="story-footer-bar">
+          <div class="story-caption-group">
+            <h4 class="story-slide-title">
+              {{ activeStory()!.slides[storySlideIndex()].title }}
+            </h4>
+            <p class="story-slide-desc">
+              {{ activeStory()!.slides[storySlideIndex()].caption }}
+            </p>
+            <span class="story-slide-price"
+              >₦{{
+                activeStory()!.slides[storySlideIndex()].price | number
+              }}</span
+            >
+          </div>
+
+          <div class="story-action-buttons">
+            <a
+              [routerLink]="[
+                '/product',
+                activeStory()!.slides[storySlideIndex()].slug,
+              ]"
+              (click)="closeStory()"
+              class="btn-story-shop"
+            >
+              Shop Piece →
+            </a>
+            <a
+              [href]="getStoryWhatsAppUrl()"
+              target="_blank"
+              class="btn-story-wa"
+            >
+              WhatsApp ↗
+            </a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  }
+
+  <!-- Action Toast Feedback -->
+  @if (shareToastMessage()) {
+    <div class="toast-share-alert">
+      <span>{{ shareToastMessage() }}</span>
+    </div>
+  }
+</div>

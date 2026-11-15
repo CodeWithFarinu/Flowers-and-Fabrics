@@ -1,0 +1,159 @@
+@if (cartStore.isOpen()) {
+  <div class="drawer-backdrop" (click)="cartStore.toggle(false)">
+    <div class="drawer-panel atelier-card" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <div class="title-wrap">
+          <h3 class="drawer-title">Shopping Bag</h3>
+          <span class="count-badge">{{ cartStore.itemCount() }} ITEMS</span>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="cartStore.toggle(false)"
+          aria-label="Close cart"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Free Delivery Progress Bar -->
+      <div class="delivery-progress-banner">
+        @if (cartStore.hasFreeDelivery()) {
+          <div class="free-del-active">
+            <span class="sparkle">✦</span>
+            <span
+              >You unlocked <strong>Complimentary Lagos Delivery</strong>!</span
+            >
+          </div>
+        } @else {
+          <div class="free-del-pending">
+            <span
+              >Add
+              <strong
+                >₦{{
+                  cartStore.distanceToFreeDelivery().toLocaleString()
+                }}</strong
+              >
+              more for Free Delivery</span
+            >
+            <div class="progress-track">
+              <div
+                class="progress-fill"
+                [style.width.%]="
+                  (cartStore.subtotal() / cartStore.freeDeliveryThreshold) * 100
+                "
+              ></div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Items List -->
+      <div class="items-list">
+        @if (cartStore.items().length === 0) {
+          <div class="empty-cart-state">
+            <p class="empty-text">Your bag is currently empty.</p>
+            <a
+              routerLink="/"
+              (click)="cartStore.toggle(false)"
+              class="btn-primary start-shopping-btn"
+            >
+              Explore Curated Feed
+            </a>
+          </div>
+        } @else {
+          @for (item of cartStore.items(); track item.id) {
+            <div class="cart-line-item">
+              <div class="item-img-wrap">
+                <img [src]="item.image" [alt]="item.productTitle" />
+              </div>
+
+              <div class="item-details">
+                <div class="item-title-row">
+                  <h4 class="item-title">{{ item.productTitle }}</h4>
+                  <button
+                    type="button"
+                    class="remove-btn"
+                    (click)="cartStore.removeItem(item.id)"
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div class="item-meta">
+                  @if (item.selectedColor) {
+                    <span class="meta-pill">{{ item.selectedColor }}</span>
+                  }
+                  @if (item.selectedSize) {
+                    <span class="meta-pill">{{ item.selectedSize }}</span>
+                  }
+                </div>
+
+                <div class="item-qty-price-row">
+                  <div class="qty-control">
+                    <button
+                      type="button"
+                      class="qty-btn"
+                      (click)="
+                        cartStore.updateQuantity(
+                          item.id,
+                          item.quantity - (item.unit === 'yard' ? 0.5 : 1)
+                        )
+                      "
+                    >
+                      −
+                    </button>
+                    <span class="qty-val price-display">
+                      {{ item.quantity }}
+                      {{ item.unit === 'yard' ? 'yds' : '' }}
+                    </span>
+                    <button
+                      type="button"
+                      class="qty-btn"
+                      (click)="
+                        cartStore.updateQuantity(
+                          item.id,
+                          item.quantity + (item.unit === 'yard' ? 0.5 : 1)
+                        )
+                      "
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <span class="line-total price-display">
+                    ₦{{ item.lineTotal.toLocaleString() }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Drawer Footer -->
+      @if (cartStore.items().length > 0) {
+        <div class="drawer-footer">
+          <div class="subtotal-row price-display">
+            <span class="subtotal-label">Estimated Subtotal</span>
+            <span class="subtotal-amount"
+              >₦{{ cartStore.subtotal().toLocaleString() }}</span
+            >
+          </div>
+          <p class="tax-hint">
+            Delivery fee and Nigerian VAT calculated at checkout
+          </p>
+
+          <a
+            routerLink="/checkout"
+            (click)="cartStore.toggle(false)"
+            class="btn-primary checkout-btn"
+          >
+            Proceed to 3-Step Checkout →
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+}
