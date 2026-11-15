@@ -1,0 +1,229 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="glass-header">
+    <ion-title>Shopping Bag ({{ cartStore.itemCount() }})</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-cart-padding">
+    @if (checkoutStore.placedOrder(); as order) {
+      <!-- Order Complete Screen -->
+      <div class="m-success-card atelier-card">
+        <div class="m-badge-check">✓</div>
+        <h2>Order Confirmed!</h2>
+        <p class="order-ref">
+          Reference: <strong>#{{ order.orderNumber }}</strong>
+        </p>
+
+        <div class="m-order-details price-display">
+          <div>
+            <span>Total Paid:</span>
+            <strong>₦{{ order.total.toLocaleString() }}</strong>
+          </div>
+          <div><span>Status:</span> <span>PAYMENT VERIFIED ✓</span></div>
+        </div>
+
+        <div class="m-actions-stack">
+          <a
+            [href]="order.whatsappTrackingUrl"
+            target="_blank"
+            class="btn-primary full-btn"
+          >
+            Track Dispatch via WhatsApp ↗
+          </a>
+          <button
+            type="button"
+            class="btn-secondary full-btn"
+            (click)="resetOrder()"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    } @else if (cartStore.items().length === 0) {
+      <div class="empty-state">
+        <p>Your shopping bag is empty.</p>
+        <a routerLink="/tabs/feed" class="btn-primary">
+          Explore Curated Feed
+        </a>
+      </div>
+    } @else {
+      <!-- Items List -->
+      <div class="m-items-list">
+        @for (item of cartStore.items(); track item.id) {
+          <div class="m-cart-item atelier-card">
+            <img
+              [src]="item.image"
+              [alt]="item.productTitle"
+              class="item-thumb"
+            />
+
+            <div class="item-body">
+              <div class="item-top">
+                <h4>{{ item.productTitle }}</h4>
+                <button
+                  type="button"
+                  class="rm-btn"
+                  (click)="cartStore.removeItem(item.id)"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <span class="meta-tag">{{ item.selectedColor }}</span>
+
+              <div class="qty-price-row">
+                <div class="qty-stepper">
+                  <button
+                    type="button"
+                    (click)="
+                      cartStore.updateQuantity(
+                        item.id,
+                        item.quantity - (item.unit === 'yard' ? 0.5 : 1)
+                      )
+                    "
+                  >
+                    −
+                  </button>
+                  <span class="price-display"
+                    >{{ item.quantity }}
+                    {{ item.unit === 'yard' ? 'yds' : '' }}</span
+                  >
+                  <button
+                    type="button"
+                    (click)="
+                      cartStore.updateQuantity(
+                        item.id,
+                        item.quantity + (item.unit === 'yard' ? 0.5 : 1)
+                      )
+                    "
+                  >
+                    +
+                  </button>
+                </div>
+
+                <strong class="line-price price-display"
+                  >₦{{ item.lineTotal.toLocaleString() }}</strong
+                >
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Checkout Step Panes -->
+      <div class="checkout-stepper-card atelier-card">
+        <div class="step-indicator">
+          <span class="step-pill" [class.active]="step() === 1"
+            >1. Details</span
+          >
+          <span class="step-pill" [class.active]="step() === 2">2. Pay</span>
+        </div>
+
+        @if (step() === 1) {
+          <div class="step-form">
+            <label class="input-lbl">Nigerian Mobile Phone * (Mandatory)</label>
+            <div class="phone-wrap">
+              <span class="prefix">+234</span>
+              <input
+                type="tel"
+                class="m-input"
+                placeholder="0803 123 4567"
+                [ngModel]="checkoutStore.customerForm().phone"
+                (ngModelChange)="onPhoneChange($event)"
+                (blur)="checkoutStore.captureLeadOnBlur()"
+              />
+            </div>
+
+            <label class="input-lbl">Full Name *</label>
+            <input
+              type="text"
+              class="m-input"
+              placeholder="e.g. Boluwatife Farinu"
+              [ngModel]="checkoutStore.customerForm().name"
+              (ngModelChange)="checkoutStore.updateForm({ name: $event })"
+            />
+
+            <label class="input-lbl">Lagos LGA & Street Address *</label>
+            <input
+              type="text"
+              class="m-input"
+              placeholder="e.g. Admiralty Way, Lekki Phase 1"
+              [ngModel]="checkoutStore.customerForm().address"
+              (ngModelChange)="checkoutStore.updateForm({ address: $event })"
+            />
+
+            <button
+              type="button"
+              class="btn-primary full-btn"
+              [disabled]="!isPhoneValid()"
+              (click)="proceedToStep2()"
+            >
+              Continue to Payment (Step 2) →
+            </button>
+          </div>
+        } @else if (step() === 2) {
+          <div class="step-form">
+            <!-- Virtual Bank Account -->
+            <div class="va-mobile-card atelier-card">
+              <span class="va-tag">WEMA VIRTUAL CHECKOUT ACCOUNT</span>
+              <div class="va-acc-row">
+                <strong class="acc-num price-display">{{
+                  checkoutStore.virtualAccount().accountNumber
+                }}</strong>
+                <button
+                  type="button"
+                  class="btn-ghost copy-btn"
+                  (click)="copyAcc()"
+                >
+                  {{ copied() ? 'Copied ✓' : 'Copy' }}
+                </button>
+              </div>
+              <span class="va-meta">{{
+                checkoutStore.virtualAccount().bankName
+              }}</span>
+              <p class="va-note">
+                Auto-detected upon transfer. Zero failed card retries.
+              </p>
+            </div>
+
+            <div class="totals-breakdown price-display">
+              <div>
+                <span>Subtotal:</span>
+                <span>₦{{ cartStore.subtotal().toLocaleString() }}</span>
+              </div>
+              <div>
+                <span>Delivery:</span>
+                <span>{{
+                  cartStore.hasFreeDelivery() ? 'FREE' : '₦3,500'
+                }}</span>
+              </div>
+              <div class="total-row">
+                <span>Total:</span>
+                <strong>₦{{ checkoutStore.total().toLocaleString() }}</strong>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn-secondary" (click)="step.set(1)">
+                ← Back
+              </button>
+              <button
+                type="button"
+                class="btn-primary pay-btn"
+                [disabled]="checkoutStore.isSubmitting()"
+                (click)="checkoutStore.submitOrder()"
+              >
+                @if (checkoutStore.isSubmitting()) {
+                  Confirming...
+                } @else {
+                  Authorize ₦{{ checkoutStore.total().toLocaleString() }} →
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</ion-content>

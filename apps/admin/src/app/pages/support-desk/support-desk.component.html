@@ -1,0 +1,156 @@
+<div class="admin-page-container">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">CUSTOMER CARE & AI COPILOT</span>
+      <h1 class="page-title">Unified Support Inbox & Real-Time Desk</h1>
+    </div>
+  </div>
+
+  <div class="inbox-layout">
+    <!-- Tickets Master List Column -->
+    <div class="tickets-column atelier-card">
+      <div class="column-header">
+        <h3>Conversations ({{ adminStore.tickets().length }})</h3>
+      </div>
+
+      <div class="tickets-list">
+        @for (t of adminStore.tickets(); track t.id) {
+          <div
+            class="ticket-list-item"
+            [class.selected]="selectedTicket()?.id === t.id"
+            (click)="selectedTicket.set(t)"
+          >
+            <div class="ticket-top-line">
+              <span class="channel-tag" [class.wa]="t.channel === 'whatsapp'">
+                {{ t.channel | uppercase }}
+              </span>
+              <span class="ticket-time">{{ t.updatedAt }}</span>
+            </div>
+
+            <strong class="ticket-cust-name">{{ t.customerName }}</strong>
+            <span class="ticket-subject">{{ t.subject }}</span>
+
+            @if (t.aiSuggestedReply) {
+              <span class="ai-ready-badge"
+                >✦ AI Reply Proffered ({{
+                  (t.aiSuggestedReply.confidence * 100).toFixed(0)
+                }}%)</span
+              >
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Ticket Detail & AI Suggestion Panel -->
+    <div class="conversation-column atelier-card">
+      @if (selectedTicket(); as ticket) {
+        <div class="conv-header">
+          <div>
+            <h3 class="conv-subject">{{ ticket.subject }}</h3>
+            <span class="conv-sub"
+              >Customer: {{ ticket.customerName }} ({{
+                ticket.customerPhone
+              }})</span
+            >
+          </div>
+          <div class="conv-header-actions">
+            <a
+              [href]="getWhatsAppUrl(ticket)"
+              target="_blank"
+              class="btn-secondary wa-header-btn"
+            >
+              💬 Reply on WhatsApp ↗
+            </a>
+            <span
+              class="status-badge"
+              [class.open]="ticket.status === 'open'"
+              [class.resolved]="ticket.status === 'resolved'"
+            >
+              ● {{ ticket.status | uppercase }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Messages Stream -->
+        <div class="conv-messages-stream">
+          @for (m of ticket.messages; track m.id) {
+            <div
+              class="msg-bubble-wrap"
+              [class.admin-wrap]="m.sender === 'admin'"
+            >
+              <div
+                class="msg-bubble"
+                [class.admin-bubble]="m.sender === 'admin'"
+              >
+                <span class="msg-sender">{{ m.sender | uppercase }}</span>
+                <p class="msg-text">{{ m.content }}</p>
+                <span class="msg-time">{{ m.timestamp }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- AI-Suggested Reply Copilot Box (§5.3-K) -->
+        @if (ticket.aiSuggestedReply; as ai) {
+          <div class="ai-copilot-box atelier-card">
+            <div class="copilot-header">
+              <div class="copilot-title">
+                <span class="sparkle">✦</span>
+                <strong>AI Suggested Reply (Intent: {{ ai.intent }})</strong>
+              </div>
+              <span class="confidence-pill"
+                >Confidence: {{ (ai.confidence * 100).toFixed(0) }}%</span
+              >
+            </div>
+
+            <p class="suggested-text">{{ ai.suggestedText }}</p>
+
+            <div class="copilot-actions">
+              <button
+                type="button"
+                class="btn-primary mini-action-btn"
+                (click)="sendAiReply(ticket.id, ai.suggestedText)"
+              >
+                1-Click Send Suggested Reply →
+              </button>
+
+              <button
+                type="button"
+                class="btn-secondary mini-action-btn"
+                (click)="editReply(ai.suggestedText)"
+              >
+                Edit Before Sending
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Manual Response Bar -->
+        <div class="response-bar">
+          <textarea
+            class="reply-textarea"
+            rows="3"
+            placeholder="Type your response to the customer..."
+            [(ngModel)]="manualReplyText"
+          ></textarea>
+          <button
+            type="button"
+            class="btn-primary send-reply-btn"
+            [disabled]="!manualReplyText.trim()"
+            (click)="sendManualReply(ticket.id)"
+          >
+            Send Message →
+          </button>
+        </div>
+      } @else {
+        <div class="no-selection-state">
+          <p>
+            Select a customer conversation from the left to view the thread and
+            AI suggestions.
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="glass-header">
+    <ion-title>Style Studio ✦</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mobile-studio-padding">
+    <!-- Token Header -->
+    <div class="token-banner atelier-card">
+      <div class="token-info">
+        <span class="sparkle">✦</span>
+        <div>
+          <strong>Style Token Balance: {{ authStore.tokenBalance() }}</strong>
+          <small>New patrons receive 1 complimentary preview</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Render Viewport -->
+    @if (aiStudioStore.isGenerating()) {
+      <div class="m-gen-box atelier-card">
+        <div class="spin-sparkle">✦</div>
+        <strong>Synthesizing Nigerian Silhouette...</strong>
+        <p>Applying realistic fabric drape & light physics</p>
+      </div>
+    } @else if (aiStudioStore.currentResult(); as res) {
+      <div class="m-result-card atelier-card">
+        <div class="m-img-wrap">
+          <img [src]="res.renderedImageUrl" alt="AI Style Preview" />
+          <span class="m-fidelity-badge">✦ AI BESPOKE MODEL</span>
+        </div>
+
+        <div class="m-res-body">
+          <strong>{{ res.prompt.fabricTitle }}</strong>
+          <p>
+            Silhouette: {{ res.prompt.garmentType | uppercase }} ·
+            {{ res.prompt.fit }}
+          </p>
+
+          <div class="m-action-btns">
+            <a
+              [href]="getWhatsAppUrl(res)"
+              target="_blank"
+              class="btn-secondary full-w-btn"
+            >
+              Share to Tailor on WhatsApp ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Generator Controls Form -->
+    <div class="m-form-card atelier-card">
+      <label class="m-label">1. Choose Fabric</label>
+      <select
+        class="m-select"
+        [ngModel]="selectedFabricId()"
+        (ngModelChange)="selectedFabricId.set($event)"
+      >
+        @for (p of fabricList(); track p.id) {
+          <option [value]="p.id">{{ p.title }}</option>
+        }
+      </select>
+
+      <label class="m-label" style="margin-top: 14px"
+        >2. Garment Silhouette</label
+      >
+      <div class="m-garments-scroll">
+        <button
+          type="button"
+          class="m-garm-btn"
+          [class.active]="selectedGarment() === 'senator'"
+          (click)="selectedGarment.set('senator')"
+        >
+          Executive Senator
+        </button>
+        <button
+          type="button"
+          class="m-garm-btn"
+          [class.active]="selectedGarment() === 'agbada'"
+          (click)="selectedGarment.set('agbada')"
+        >
+          Grand Agbada
+        </button>
+        <button
+          type="button"
+          class="m-garm-btn"
+          [class.active]="selectedGarment() === 'kaftan'"
+          (click)="selectedGarment.set('kaftan')"
+        >
+          Modern Kaftan
+        </button>
+        <button
+          type="button"
+          class="m-garm-btn"
+          [class.active]="selectedGarment() === 'iro_and_buba'"
+          (click)="selectedGarment.set('iro_and_buba')"
+        >
+          Iro & Buba
+        </button>
+      </div>
+
+      <label class="m-label" style="margin-top: 14px">3. Tailor Notes</label>
+      <input
+        type="text"
+        class="m-input"
+        placeholder="e.g. Slim fit, include Onyx gold cufflinks"
+        [(ngModel)]="customNotes"
+      />
+
+      <button
+        type="button"
+        class="btn-primary full-w-btn gen-submit-btn"
+        [disabled]="
+          aiStudioStore.isGenerating() || authStore.tokenBalance() < 1
+        "
+        (click)="generate()"
+      >
+        Generate Style Preview (1 Token) ✦
+      </button>
+    </div>
+  </div>
+</ion-content>

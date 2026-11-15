@@ -1,1 +1,43 @@
-/* You can add global styles to this file, and also import other style files */
+@import '../../../libs/shared/ui-tokens/src/lib/tokens.css';
+
+/* Global admin styles: Linear / Vercel calm density */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+/* Dense table utility */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.admin-table th {
+  padding: 10px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.725rem;
+  letter-spacing: 0.06em;
+}
+
+.admin-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text);
+}
+
+.admin-table tr:hover td {
+  background: var(--surface);
+}

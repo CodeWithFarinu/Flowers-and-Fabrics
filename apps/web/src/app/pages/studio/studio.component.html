@@ -1,0 +1,204 @@
+<div class="studio-container">
+  <div class="studio-header">
+    <div>
+      <span class="studio-eyebrow">✦ TEEPHA GENERATIVE STYLE STUDIO</span>
+      <h1 class="studio-title">Virtual Fit & Silhouette Visualization</h1>
+      <p class="studio-subtitle">
+        Preview luxury fabrics on bespoke Nigerian silhouettes before handing
+        over to your tailor.
+      </p>
+    </div>
+
+    <div class="token-balance-pill atelier-card">
+      <span class="token-icon">✦</span>
+      <span class="token-count">{{ authStore.tokenBalance() }}</span>
+      <span class="token-label">Tokens Available</span>
+    </div>
+  </div>
+
+  <div class="studio-layout">
+    <!-- Configuration & Prompt Sidebar -->
+    <div class="studio-controls-column atelier-card">
+      <h3 class="controls-heading">1. Select Fabric to Visualize</h3>
+      <div class="fabric-picker-row">
+        <select
+          class="studio-select"
+          [ngModel]="selectedFabric()?.id"
+          (ngModelChange)="onFabricChange($event)"
+        >
+          @for (p of fabricProducts(); track p.id) {
+            <option [value]="p.id">
+              {{ p.title }} (₦{{ p.price.toLocaleString() }}/yd)
+            </option>
+          }
+        </select>
+      </div>
+
+      @if (selectedFabric(); as fab) {
+        <div class="selected-fabric-preview">
+          <img [src]="fab.featuredImage" [alt]="fab.title" />
+          <div>
+            <strong>{{ fab.title }}</strong>
+            <span
+              >{{ fab.brand }} ·
+              {{ fab.attributes?.weaveType || 'Bespoke Weave' }}</span
+            >
+          </div>
+        </div>
+      }
+
+      <h3 class="controls-heading" style="margin-top: 24px">
+        2. Traditional or Modern Silhouette
+      </h3>
+      <div class="garment-type-grid">
+        @for (g of garments; track g.type) {
+          <button
+            type="button"
+            class="garment-chip"
+            [class.active]="selectedGarmentType() === g.type"
+            (click)="selectedGarmentType.set(g.type)"
+          >
+            {{ g.label }}
+          </button>
+        }
+      </div>
+
+      <h3 class="controls-heading" style="margin-top: 24px">
+        3. Tailoring Fit & Melanin Tone
+      </h3>
+      <div class="fit-skin-row">
+        <div class="form-subgroup">
+          <label class="sub-label">Cut / Fit</label>
+          <select class="studio-select" [(ngModel)]="selectedFit">
+            <option value="slim_fit">Slim Fit (Tapered)</option>
+            <option value="classic">Classic Executive</option>
+            <option value="relaxed">Relaxed Drape</option>
+          </select>
+        </div>
+
+        <div class="form-subgroup">
+          <label class="sub-label">Melanin Complexion</label>
+          <select class="studio-select" [(ngModel)]="selectedSkinTone">
+            <option value="deep_melanin">Deep Melanin</option>
+            <option value="warm_caramel">Warm Caramel</option>
+            <option value="chestnut">Rich Chestnut</option>
+            <option value="fair">Golden Warm</option>
+          </select>
+        </div>
+      </div>
+
+      <h3 class="controls-heading" style="margin-top: 24px">
+        4. Quick Style Inspirations
+      </h3>
+      <div class="suggestions-list">
+        @for (s of aiStudioStore.promptSuggestions; track s.label) {
+          <button
+            type="button"
+            class="suggestion-item-btn"
+            (click)="applyPromptSuggestion(s.prompt)"
+          >
+            <strong>{{ s.label }}</strong>
+            <span>{{ s.prompt }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="custom-prompt-wrap">
+        <label class="sub-label">Specialist Tailor Notes / Accessories</label>
+        <input
+          type="text"
+          class="studio-input"
+          placeholder="e.g. Include matching Fila cap and 18K gold cufflinks"
+          [(ngModel)]="customNotes"
+        />
+      </div>
+
+      <button
+        type="button"
+        class="btn-primary generate-cta-btn"
+        [disabled]="
+          aiStudioStore.isGenerating() || authStore.tokenBalance() < 1
+        "
+        (click)="triggerGeneration()"
+      >
+        @if (aiStudioStore.isGenerating()) {
+          Synthesizing Bespoke Render... ✦
+        } @else {
+          Generate Silhouette Preview (Cost: 1 Token) ✦
+        }
+      </button>
+    </div>
+
+    <!-- Rendered Results Viewport -->
+    <div class="studio-viewport-column">
+      @if (aiStudioStore.isGenerating()) {
+        <div class="generating-viewport atelier-card">
+          <div class="spinning-sparkle">✦</div>
+          <h3 class="gen-title">Synthesizing Bespoke Model Render</h3>
+          <p class="gen-p">
+            Draping {{ selectedFabric()?.title }} onto a tailored
+            {{ selectedGarmentType() | uppercase }} silhouette with authentic
+            lighting...
+          </p>
+        </div>
+      } @else if (aiStudioStore.currentResult(); as res) {
+        <div class="result-showcase atelier-card">
+          <div class="result-media-wrap">
+            <img [src]="res.renderedImageUrl" alt="AI Style Preview" />
+            <span class="preview-fidelity-badge"
+              >✦ BESPOKE FIDELITY RENDER</span
+            >
+          </div>
+
+          <div class="result-details">
+            <div class="result-meta">
+              <h3>{{ res.prompt.fabricTitle }}</h3>
+              <p class="silhouette-readout">
+                Mode:
+                <strong>{{ res.prompt.garmentType | uppercase }}</strong> · Fit:
+                {{ res.prompt.fit }} · Tone: {{ res.prompt.skinTone }}
+              </p>
+            </div>
+
+            <div class="result-actions">
+              <a
+                [href]="getTailorWhatsAppUrl(res)"
+                target="_blank"
+                class="btn-secondary tailor-share-btn"
+              >
+                Send to My Tailor on WhatsApp ↗
+              </a>
+
+              <a
+                [routerLink]="['/product', selectedFabric()?.slug]"
+                class="btn-primary shop-exact-btn"
+              >
+                Order This Fabric →
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Generation History Strip -->
+      @if (aiStudioStore.history().length > 1) {
+        <div class="history-section">
+          <h4 class="history-heading">Previous Saved Generations</h4>
+          <div class="history-grid">
+            @for (h of aiStudioStore.history(); track h.id) {
+              <div
+                class="history-card atelier-card"
+                (click)="aiStudioStore.currentResult.set(h)"
+              >
+                <img [src]="h.renderedImageUrl" [alt]="h.prompt.garmentType" />
+                <span class="hist-label">{{
+                  h.prompt.garmentType | uppercase
+                }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

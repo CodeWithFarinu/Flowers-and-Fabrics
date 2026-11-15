@@ -1,34 +1,74 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import {
+  RequestOtpDto,
+  VerifyOtpDto,
+  RefreshTokenDto,
+  GuestSessionDto,
+  GoogleAuthDto,
+} from './dto/interface.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('otp/request')
+  @ApiOperation({ summary: 'Request OTP code via SMS or WhatsApp' })
+  requestOtp(@Body() dto: RequestOtpDto) {
+    return this.authService.requestOtp(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post('otp/verify')
+  @ApiOperation({ summary: 'Verify OTP code and authenticate user' })
+  verifyOtp(@Body() dto: VerifyOtpDto) {
+    return this.authService.verifyOtp(dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  @Post('guest')
+  @ApiOperation({
+    summary: 'Start anonymous guest session for instant checkout',
+  })
+  createGuest(@Body() dto: GuestSessionDto) {
+    return this.authService.createGuestSession(dto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+  @Post('refresh')
+  @ApiOperation({ summary: 'Rotate refresh token and issue new access token' })
+  refreshToken(@Body() dto: RefreshTokenDto) {
+    return this.authService.refreshToken(dto.refreshToken);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Post('google')
+  @ApiOperation({
+    summary: 'Authenticate with Google One-Tap or Google Identity credential',
+  })
+  googleAuth(@Body() dto: GoogleAuthDto) {
+    return this.authService.googleLogin(dto);
+  }
+
+  @Get('google/config')
+  @ApiOperation({
+    summary: 'Get Google OAuth Client ID for frontend GIS initialization',
+  })
+  googleConfig() {
+    return this.authService.getGoogleConfig();
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current authenticated user profile' })
+  getMe(@Request() req: any) {
+    return this.authService.getMe(req.user.id);
   }
 }

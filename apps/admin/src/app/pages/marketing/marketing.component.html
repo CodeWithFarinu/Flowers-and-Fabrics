@@ -1,0 +1,304 @@
+<div class="admin-page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">GROWTH, ATTRIBUTION & STORY RAILS</span>
+      <h1 class="page-title">Marketing Attribution & Community Curation</h1>
+    </div>
+
+    <div class="header-actions">
+      @if (activeTab() === 'links') {
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="showCreateModal.set(true)"
+        >
+          + Create Tracked Ad Link
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Tab Switcher -->
+  <div class="nav-tabs-bar">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'links'"
+      (click)="activeTab.set('links')"
+    >
+      Tracked Ad Links & ROAS Engine
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'rails'"
+      (click)="activeTab.set('rails')"
+    >
+      Story Rails Curation & Patron Fits ({{ pendingFitsCount() }} Pending)
+    </button>
+  </div>
+
+  <!-- TAB 1: TRACKED AD LINKS -->
+  @if (activeTab() === 'links') {
+    <!-- Performance Metrics Summary -->
+    <div class="marketing-kpi-row">
+      <div class="m-card atelier-card">
+        <span class="m-lbl">Total Ad Traffic Clicks</span>
+        <strong class="m-val price-display">8,430</strong>
+        <span class="m-sub">Across Meta, TikTok & Affiliates</span>
+      </div>
+
+      <div class="m-card atelier-card">
+        <span class="m-lbl">Captured Leads from Ads</span>
+        <strong class="m-val price-display">1,052</strong>
+        <span class="m-sub">Unique Nigerian phone captures (12.4% CPL)</span>
+      </div>
+
+      <div class="m-card atelier-card">
+        <span class="m-lbl">Attributed Revenue</span>
+        <strong class="m-val price-display">₦18,296,000</strong>
+        <span class="m-sub">Directly tracked from ad links</span>
+      </div>
+    </div>
+
+    <!-- Tracked Links Table -->
+    <div class="table-card atelier-card">
+      <h3 class="table-title">Active Tracked Product Links</h3>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Campaign Code</th>
+              <th>Target Product</th>
+              <th>Channel / Source</th>
+              <th>Clicks</th>
+              <th>Leads</th>
+              <th>Orders</th>
+              <th>Revenue Generated</th>
+              <th>Tracking Short URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (link of adminStore.trackedLinks(); track link.id) {
+              <tr>
+                <td>
+                  <strong>{{ link.code }}</strong>
+                </td>
+                <td>{{ link.productTitle }}</td>
+                <td>
+                  <span
+                    class="channel-pill"
+                    [class.meta]="
+                      link.utmSource.includes('facebook') ||
+                      link.utmSource.includes('instagram')
+                    "
+                  >
+                    {{ link.utmSource | uppercase }}
+                  </span>
+                </td>
+                <td class="price-display">
+                  {{ link.clicks.toLocaleString() }}
+                </td>
+                <td class="price-display font-semibold">
+                  {{ link.leadsCaptured }}
+                </td>
+                <td class="price-display font-semibold">
+                  {{ link.ordersCompleted }}
+                </td>
+                <td class="price-display font-bold">
+                  ₦{{ link.revenueGenerated.toLocaleString() }}
+                </td>
+                <td>
+                  <div class="copy-url-wrap">
+                    <span class="short-url-txt">{{ link.shortUrl }}</span>
+                    <button
+                      type="button"
+                      class="btn-ghost copy-btn"
+                      (click)="copyToClipboard(link.shortUrl)"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- TAB 2: STORY RAILS PATRON COMMUNITY FITS CURATION -->
+  @if (activeTab() === 'rails') {
+    <div class="marketing-kpi-row">
+      <div class="m-card atelier-card">
+        <span class="m-lbl">Pending Submissions</span>
+        <strong class="m-val price-display text-amber">{{
+          pendingFitsCount()
+        }}</strong>
+        <span class="m-sub">Awaiting moderation approval</span>
+      </div>
+
+      <div class="m-card atelier-card">
+        <span class="m-lbl">Approved Fits on Rails</span>
+        <strong class="m-val price-display text-emerald">{{
+          approvedFitsCount()
+        }}</strong>
+        <span class="m-sub">Broadcasting live in story rails feed</span>
+      </div>
+
+      <div class="m-card atelier-card">
+        <span class="m-lbl">Active Curated Story Rails</span>
+        <strong class="m-val price-display">4 Rails</strong>
+        <span class="m-sub">Senator · Aso-Ebi · Streetwear · Black-Tie</span>
+      </div>
+    </div>
+
+    <div class="fits-moderation-grid">
+      @for (fit of adminStore.communityFits(); track fit.id) {
+        <div class="fit-card atelier-card">
+          <div class="fit-image-wrap">
+            <img
+              [src]="fit.photoUrl || fit.imageUrl"
+              [alt]="fit.outfitTitle || fit.fabricTitle"
+              class="fit-img"
+            />
+            <span
+              class="fit-status-badge"
+              [class.approved]="fit.status === 'approved'"
+              [class.pending]="fit.status === 'pending'"
+              [class.rejected]="fit.status === 'rejected'"
+            >
+              ● {{ fit.status | uppercase }}
+            </span>
+          </div>
+
+          <div class="fit-content">
+            <span class="fit-rail-target">
+              ✦ RAIL: {{ getRailName(fit.railTarget) }}
+            </span>
+            <h4 class="fit-title">
+              {{ fit.outfitTitle || fit.fabricTitle }}
+            </h4>
+            <p class="fit-fabric">
+              Fabric: {{ fit.fabricUsed || fit.fabricTitle }}
+            </p>
+
+            <div class="patron-info-line">
+              <div class="patron-name-block">
+                <strong>{{ fit.patronName }}</strong>
+                <small>{{ fit.city }}</small>
+              </div>
+              @if (fit.patronPhone) {
+                <small class="patron-phone">{{ fit.patronPhone }}</small>
+              }
+            </div>
+
+            <div class="fit-actions-row">
+              @if (fit.status !== 'approved') {
+                <button
+                  type="button"
+                  class="btn-primary mini-btn approve-btn"
+                  (click)="approveFit(fit.id)"
+                >
+                  ✓ Approve for Rail
+                </button>
+              }
+              @if (fit.status !== 'rejected') {
+                <button
+                  type="button"
+                  class="btn-ghost mini-btn reject-btn"
+                  (click)="rejectFit(fit.id)"
+                >
+                  ✕ Reject
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Create Tracked Link Modal -->
+@if (showCreateModal()) {
+  <div class="modal-backdrop" (click)="showCreateModal.set(false)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">ATTRIBUTION LINK GENERATOR</span>
+          <h3 class="modal-title">Create Tracked Ad Campaign Link</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="showCreateModal.set(false)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Target Product *</label>
+          <select class="form-select" [(ngModel)]="selectedProductSlug">
+            @for (p of productStore.products(); track p.id) {
+              <option [value]="p.slug">
+                {{ p.title }} (₦{{ p.price.toLocaleString() }})
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Traffic Channel (UTM Source) *</label>
+          <select class="form-select" [(ngModel)]="newUtmSource">
+            <option value="facebook_ads">Facebook / Meta Sponsored Ad</option>
+            <option value="instagram_story">
+              Instagram Story Swipe-Up / Sticker
+            </option>
+            <option value="tiktok">TikTok Creator Video Unboxing</option>
+            <option value="whatsapp_broadcast">
+              WhatsApp VIP Concierge Broadcast
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Campaign Name (UTM Campaign) *</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="e.g. lagos_senator_drop_q4"
+            [(ngModel)]="newUtmCampaign"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Affiliate Guild Code (Optional)</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="e.g. AFF-SEUN-10"
+            [(ngModel)]="newAffiliateCode"
+          />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="showCreateModal.set(false)"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn-primary" (click)="generateLink()">
+          Generate Link
+        </button>
+      </div>
+    </div>
+  </div>
+}

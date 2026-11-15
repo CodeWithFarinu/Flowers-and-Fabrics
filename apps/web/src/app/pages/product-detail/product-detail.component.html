@@ -1,0 +1,881 @@
+@if (product(); as prod) {
+  <div class="pdp-container">
+    <!-- Breadcrumbs -->
+    <nav class="pdp-breadcrumbs">
+      <a routerLink="/" class="crumb-link">Home</a>
+      <span class="crumb-sep">/</span>
+      <a [routerLink]="['/collections', prod.category]" class="crumb-link">{{
+        prod.category | uppercase
+      }}</a>
+      <span class="crumb-sep">/</span>
+      <span class="crumb-title">{{ prod.title }}</span>
+    </nav>
+
+    <div class="pdp-grid">
+      <!-- Left Column: Auto-Sliding Gallery & Technical Specs -->
+      <div class="gallery-column">
+        <!-- Main Viewport with Stylish Auto-Slide Transition -->
+        <div
+          class="main-image-viewport atelier-card"
+          (mouseenter)="pauseAutoSlide()"
+          (mouseleave)="resumeAutoSlide()"
+        >
+          @for (
+            slide of allGalleryImages();
+            track slide.url;
+            let idx = $index
+          ) {
+            <div
+              class="carousel-slide-layer"
+              [class.active]="activeImageIndex() === idx"
+            >
+              <img
+                [src]="slide.url"
+                [alt]="prod.title"
+                class="main-img"
+                loading="eager"
+              />
+              @if (slide.isAi) {
+                <span class="ai-generated-badge"
+                  >✦ AI BESPOKE SILHOUETTE PREVIEW</span
+                >
+              }
+            </div>
+          }
+
+          <!-- Subtle Live Progress Hairline -->
+          <div class="slide-progress-rail">
+            <div
+              class="slide-progress-fill"
+              [style.width]="autoSlideProgress() + '%'"
+            ></div>
+          </div>
+
+          <!-- Gallery Slider Arrows -->
+          @if (allGalleryImages().length > 1) {
+            <button
+              type="button"
+              class="gallery-nav-btn prev-btn"
+              (click)="prevGalleryImage()"
+              aria-label="Previous image"
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              class="gallery-nav-btn next-btn"
+              (click)="nextGalleryImage()"
+              aria-label="Next image"
+            >
+              →
+            </button>
+          }
+
+          <div class="gallery-counter">
+            {{ activeImageIndex() + 1 }} / {{ allGalleryImages().length }}
+          </div>
+        </div>
+
+        <!-- Thumbnails Selector Slider Strip -->
+        <div class="thumbnails-strip">
+          @for (img of allGalleryImages(); track img.url; let idx = $index) {
+            <button
+              type="button"
+              class="thumb-btn"
+              [class.active]="activeImageIndex() === idx"
+              (click)="selectGalleryImage(idx)"
+              [title]="img.label"
+            >
+              <img [src]="img.url" [alt]="img.label" />
+              @if (img.isAi) {
+                <span class="thumb-ai-tag">✦ AI</span>
+              }
+            </button>
+          }
+        </div>
+
+        <!-- Macro Weave Inspection Trigger Button -->
+        <button
+          type="button"
+          class="macro-inspect-btn"
+          (click)="showMacroInspection.set(true)"
+        >
+          <span class="btn-glyph">⟡</span> Inspect High-Resolution Macro Weave
+          at 400% Zoom
+        </button>
+
+        <!-- Technical Specifications Card -->
+        <div class="specs-card atelier-card">
+          <span class="specs-kicker">TECHNICAL WEAVE SPECIFICATIONS</span>
+          <div class="specs-grid">
+            @if (prod.attributes?.materialComposition) {
+              <div class="spec-cell">
+                <span class="spec-lbl">Composition</span>
+                <strong class="spec-val">{{
+                  prod.attributes.materialComposition
+                }}</strong>
+              </div>
+            }
+            @if (prod.attributes?.weaveType) {
+              <div class="spec-cell">
+                <span class="spec-lbl">Weave Structure</span>
+                <strong class="spec-val">{{
+                  prod.attributes.weaveType
+                }}</strong>
+              </div>
+            }
+            @if (prod.attributes?.gsm) {
+              <div class="spec-cell">
+                <span class="spec-lbl">Fabric Weight</span>
+                <strong class="spec-val">{{ prod.attributes.gsm }} GSM</strong>
+              </div>
+            }
+            @if (prod.attributes?.widthInches) {
+              <div class="spec-cell">
+                <span class="spec-lbl">Fabric Width</span>
+                <strong class="spec-val"
+                  >{{ prod.attributes.widthInches }} Inches (Double
+                  Width)</strong
+                >
+              </div>
+            }
+            @if (prod.attributes?.occasion) {
+              <div class="spec-cell">
+                <span class="spec-lbl">Recommended Occasion</span>
+                <strong class="spec-val">{{ prod.attributes.occasion }}</strong>
+              </div>
+            }
+            @if (prod.attributes?.careInstructions) {
+              <div class="spec-cell full-w">
+                <span class="spec-lbl">Care & Maintenance</span>
+                <strong class="spec-val">{{
+                  prod.attributes.careInstructions
+                }}</strong>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Provenance & Heritage Accreditation -->
+        <div class="provenance-card atelier-card">
+          <div class="prov-header">
+            <span class="prov-seal">🛡️</span>
+            <div>
+              <span class="prov-kicker">HERITAGE ACCREDITATION</span>
+              <h4 class="prov-title">Certified Mill Provenance</h4>
+            </div>
+          </div>
+          <p class="prov-desc">
+            Authenticated by Teepha Flowers & Fabrics Lagos Vault under
+            Certificate
+            <strong>#TP-NG-88921-2026</strong>. Sourced directly with strict
+            inspections for yarn tension, dye fastness, and tropical climate
+            longevity. Includes 14-day exchange privilege at any VI or Abuja
+            boutique.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column: Product Specs, Pricing, & Actions -->
+      <div class="details-column">
+        <!-- Live Social Proof Demand Signal -->
+        <div class="live-demand-banner">
+          <span class="live-flame">🔥</span>
+          <span class="demand-text"
+            >14 patrons viewing this textile now in Lagos & Abuja · 3 bespoke
+            cuts dispatched today</span
+          >
+        </div>
+
+        <div class="brand-rating-header">
+          <span class="brand-tag">{{ prod.brand | uppercase }}</span>
+          <div class="rating-badge" (click)="scrollToReviews()">
+            ★ {{ prod.rating }}
+            <span class="count">({{ prod.reviewCount }} verified reviews)</span>
+          </div>
+        </div>
+
+        <h1 class="pdp-title">{{ prod.title }}</h1>
+
+        <div class="price-section price-display">
+          <span class="hero-price">
+            ₦{{
+              (
+                prod.price * (prod.unit === 'yard' ? selectedQuantity() : 1)
+              ).toLocaleString()
+            }}
+          </span>
+          @if (prod.unit === 'yard') {
+            <span class="unit-sub"
+              >({{ selectedQuantity() }} yards @ ₦{{
+                prod.price.toLocaleString()
+              }}/yd)</span
+            >
+          }
+          @if (prod.compareAtPrice) {
+            <span class="compare-price"
+              >₦{{
+                (
+                  prod.compareAtPrice *
+                  (prod.unit === 'yard' ? selectedQuantity() : 1)
+                ).toLocaleString()
+              }}</span
+            >
+          }
+        </div>
+
+        <p class="product-description">{{ prod.description }}</p>
+
+        <!-- Color Swatches -->
+        @if (prod.colors && prod.colors.length > 0) {
+          <div class="option-block">
+            <div class="option-header">
+              <span class="option-label"
+                >Selected Shade: <strong>{{ selectedColor() }}</strong></span
+              >
+            </div>
+            <div class="swatches-grid">
+              @for (c of prod.colors; track c.name) {
+                <button
+                  type="button"
+                  class="swatch-btn"
+                  [class.active]="selectedColor() === c.name"
+                  (click)="selectedColor.set(c.name)"
+                  [title]="c.name"
+                >
+                  <span
+                    class="color-dot"
+                    [style.background-color]="c.hex"
+                  ></span>
+                  <span class="color-text">{{ c.name }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Yardage Selector (for Fabrics) -->
+        @if (prod.unit === 'yard') {
+          <div class="option-block">
+            <atelier-yardage-selector
+              [quantity]="selectedQuantity()"
+              [minQuantity]="prod.minOrderQty || 2"
+              [step]="prod.yardStep || 0.5"
+              (quantityChange)="selectedQuantity.set($event)"
+            />
+
+            <button
+              type="button"
+              class="calc-trigger-btn"
+              (click)="showCalculator.set(true)"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                <line x1="8" y1="6" x2="16" y2="6"></line>
+                <line x1="8" y1="10" x2="16" y2="10"></line>
+                <line x1="8" y1="14" x2="16" y2="14"></line>
+                <line x1="8" y1="18" x2="16" y2="18"></line>
+              </svg>
+              Need help with measurements? (Fabric Yardage Calculator)
+            </button>
+
+            <!-- Bespoke Garment Presets -->
+            <div class="preset-yardage-row">
+              <span class="preset-label">⚜ Quick Garment Yardage Presets:</span>
+              <div class="preset-pills-wrap">
+                <button
+                  type="button"
+                  class="garment-preset-pill"
+                  [class.active]="selectedQuantity() === 7"
+                  (click)="selectedQuantity.set(7)"
+                >
+                  <span class="preset-icon">✦</span> 3-Piece Agbada (7 Yds)
+                </button>
+                <button
+                  type="button"
+                  class="garment-preset-pill"
+                  [class.active]="selectedQuantity() === 4"
+                  (click)="selectedQuantity.set(4)"
+                >
+                  <span class="preset-icon">✂</span> Senator Suit (4 Yds)
+                </button>
+                <button
+                  type="button"
+                  class="garment-preset-pill"
+                  [class.active]="selectedQuantity() === 4.5"
+                  (click)="selectedQuantity.set(4.5)"
+                >
+                  <span class="preset-icon">❖</span> Kaftan & Trousers (4.5 Yds)
+                </button>
+                <button
+                  type="button"
+                  class="garment-preset-pill"
+                  [class.active]="selectedQuantity() === 5"
+                  (click)="selectedQuantity.set(5)"
+                >
+                  <span class="preset-icon">⟡</span> Female Iro & Buba (5 Yds)
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Size Selector (for Sneakers) -->
+        @if (prod.sizes && prod.sizes.length > 0) {
+          <div class="option-block">
+            <div class="option-header">
+              <span class="option-label"
+                >Select Size: <strong>{{ selectedSize() }}</strong></span
+              >
+              <span class="size-guide-hint">True to size (EU/UK Standard)</span>
+            </div>
+            <div class="sizes-grid">
+              @for (s of prod.sizes; track s) {
+                <button
+                  type="button"
+                  class="size-btn"
+                  [class.active]="selectedSize() === s"
+                  (click)="selectedSize.set(s)"
+                >
+                  {{ s }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Primary CTAs -->
+        <div class="cta-actions-group">
+          <button
+            type="button"
+            class="btn-primary buy-now-hero-btn"
+            (click)="buyNow()"
+          >
+            <span class="btn-glyph">✦</span> Buy Now (Instant 3-Step Checkout)
+          </button>
+          <button
+            type="button"
+            class="btn-secondary add-cart-btn"
+            (click)="addToCart()"
+          >
+            <span class="btn-glyph">✂</span> Add to Shopping Bag
+          </button>
+        </div>
+
+        <!-- Swatch Sample Order Card -->
+        @if (prod.unit === 'yard') {
+          <div class="swatch-sample-card atelier-card">
+            <div class="swatch-card-left">
+              <span class="swatch-icon">⚜</span>
+              <div>
+                <strong>Order 4-Inch Fabric Swatch Sample (₦2,500)</strong>
+                <p>
+                  Inspect the weave texture, luster, and drape in person. 100%
+                  credited back when you purchase a full bolt.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-secondary btn-sm"
+              (click)="orderSwatchSample()"
+            >
+              {{ swatchAdded() ? '✓ Swatch in Bag' : '+ Order Swatch Card' }}
+            </button>
+          </div>
+        }
+
+        <!-- Master Tailor Concierge Referral Option -->
+        <div class="tailor-referral-card atelier-card">
+          <div class="tailor-ref-left">
+            <span class="tailor-icon">✂</span>
+            <div>
+              <strong>Accredited Master Tailor Concierge</strong>
+              <p>
+                Complimentary referral to accredited master tailors in Victoria
+                Island, Ikoyi, or Maitama for bespoke basting & fitting.
+              </p>
+            </div>
+          </div>
+          <label class="concierge-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="requestTailorConcierge()"
+              (change)="requestTailorConcierge.set(!requestTailorConcierge())"
+            />
+            <span>Include Concierge</span>
+          </label>
+        </div>
+
+        <!-- Stylist & Master Tailor Guidance Dossier -->
+        <div class="tailor-guidance-card atelier-card">
+          <span class="dossier-kicker">✦ TEEPHA MASTER TAILOR'S DOSSIER</span>
+          <div class="dossier-row">
+            <strong class="dossier-title">Silhouette Recommendation:</strong>
+            <span class="dossier-desc"
+              >Best tailored as a 4-piece Grand Agbada or slim-fit Senator with
+              hidden placket and mandarin collar.</span
+            >
+          </div>
+          <div class="dossier-row">
+            <strong class="dossier-title">Recommended Accessories:</strong>
+            <span class="dossier-desc"
+              >Pair with Sovereign Onyx & Gold Cufflinks and handcrafted mule
+              slippers in polished calfskin.</span
+            >
+          </div>
+        </div>
+
+        <!-- Complimentary VIP Presentation Packaging -->
+        <div class="packaging-card atelier-card">
+          <div class="pack-icon">🎁</div>
+          <div class="pack-info">
+            <strong>Complimentary VIP Presentation Box</strong>
+            <p>
+              Delivered in our sealed cedar-lined presentation box with solid
+              brass monogrammed measuring tape & protective breathable canvas
+              garment bag.
+            </p>
+          </div>
+        </div>
+
+        <!-- Trust Grid -->
+        <div class="trust-grid">
+          <div class="trust-item">
+            <span class="trust-icon">⚡</span>
+            <div>
+              <strong>Lagos Priority Same-Day Dispatch</strong>
+              <p>Order by 1:00 PM for arrival this evening</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="trust-icon">✓</span>
+            <div>
+              <strong>100% Authentic Fabric Guarantee</strong>
+              <p>Direct from St. Gallen, Biella & Abeokuta Guilds</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Concierge Support -->
+        <div class="whatsapp-card atelier-card">
+          <div class="wa-content">
+            <strong>Bespoke Aso-Ebi & Swatch Consultation</strong>
+            <p>Chat directly with our Lagos Fabric Concierge on WhatsApp.</p>
+          </div>
+          <a
+            [href]="getWhatsAppUrl(prod)"
+            target="_blank"
+            class="btn-secondary wa-btn"
+          >
+            Chat on WhatsApp ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- IN-PAGE AI PATTERN & SILHOUETTE GENERATOR TOOL -->
+    <!-- ============================================== -->
+    <section class="ai-studio-integrated-section atelier-card">
+      <div class="ai-tool-header">
+        <div class="ai-title-wrap">
+          <span class="ai-kicker">✦ TEEPHA AI PATTERN & SILHOUETTE STUDIO</span>
+          <h2 class="ai-tool-title">Prompt AI to Visualize this Material</h2>
+          <p class="ai-tool-desc">
+            Generate bespoke Agbada, Senator, Kaftan, or Iro & Buba designs
+            utilizing this exact texture before your tailor makes the first cut.
+          </p>
+        </div>
+        <div class="token-balance-indicator">
+          <span class="token-num">{{ authStore.tokenBalance() }}</span>
+          <span class="token-lbl">Tokens Available</span>
+        </div>
+      </div>
+
+      <div class="ai-tool-body">
+        <!-- Preset Prompt Chips -->
+        <div class="preset-chips-row">
+          <span class="preset-lbl">Quick Presets:</span>
+          <button
+            type="button"
+            class="preset-chip"
+            (click)="
+              setPrompt(
+                '3-Piece Royal Agbada with hand-embroidered gold neckline'
+              )
+            "
+          >
+            ✦ Royal Yoruba Agbada
+          </button>
+          <button
+            type="button"
+            class="preset-chip"
+            (click)="
+              setPrompt(
+                'Slim-fit Executive Senator with hidden placket and mandarin collar'
+              )
+            "
+          >
+            ✦ Executive Senator Fit
+          </button>
+          <button
+            type="button"
+            class="preset-chip"
+            (click)="
+              setPrompt(
+                'Contemporary Kaftan with asymmetrical geometric chest embroidery'
+              )
+            "
+          >
+            ✦ Contemporary Kaftan
+          </button>
+          <button
+            type="button"
+            class="preset-chip"
+            (click)="
+              setPrompt(
+                'Traditional Iro and Buba with modern structured peplum'
+              )
+            "
+          >
+            ✦ Iro & Buba Structured
+          </button>
+        </div>
+
+        <!-- Prompt Input Box -->
+        <div class="prompt-input-row">
+          <input
+            type="text"
+            [(ngModel)]="customAiPrompt"
+            placeholder="Describe your design (e.g. Slim-fit Senator with double cuff and concealed buttons)..."
+            class="ai-prompt-input"
+          />
+          <button
+            type="button"
+            class="btn-primary ai-generate-btn"
+            [disabled]="isGeneratingAi()"
+            (click)="generateAiDesign()"
+          >
+            @if (isGeneratingAi()) {
+              <span class="ai-spinner"></span>
+              Generating Silhouette...
+            } @else {
+              Generate AI Preview ✦
+            }
+          </button>
+        </div>
+
+        <!-- AI Render Output Display -->
+        @if (aiGeneratedOutput(); as output) {
+          <div class="ai-output-showcase atelier-card">
+            <div class="output-media-wrap">
+              <img
+                [src]="output.imageUrl"
+                [alt]="output.title"
+                class="output-img"
+              />
+              <span class="output-badge">✦ AI GENERATION COMPLETE</span>
+            </div>
+
+            <div class="output-details">
+              <h3 class="output-title">{{ output.title }}</h3>
+              <p class="output-prompt-echo">
+                <strong>Prompt:</strong> "{{ output.promptUsed }}"
+              </p>
+              <div class="tailor-specs-card">
+                <span class="specs-badge">TAILOR CUTTING GUIDELINES</span>
+                <ul>
+                  <li>
+                    Recommended Yardage:
+                    <strong>4.0 - 4.5 Yards</strong>
+                  </li>
+                  <li>
+                    Thread Matching:
+                    <strong>#1A1A1A Gutermann Heavy Silk</strong>
+                  </li>
+                  <li>
+                    Collar Structure:
+                    <strong>Lightweight French Canvas Interfacing</strong>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="output-actions">
+                <a
+                  [href]="
+                    'https://wa.me/2348000000000?text=Lookbook%20Generation%20for%20' +
+                    prod.title
+                  "
+                  target="_blank"
+                  class="btn-primary"
+                >
+                  Send Lookbook to Tailor on WhatsApp →
+                </a>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="saveLookbookToAccount()"
+                >
+                  {{
+                    lookbookSaved()
+                      ? '✓ Saved to Lookbook'
+                      : 'Save to My Account'
+                  }}
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VERIFIED CUSTOMER REVIEWS & COMMENTING SECTION -->
+    <!-- ============================================== -->
+    <section class="reviews-section" id="reviewsSection">
+      <div class="reviews-header">
+        <div>
+          <span class="reviews-kicker">COMMUNITY TRUST & REVIEWS</span>
+          <h2 class="reviews-title">Client Feedback & Comments</h2>
+        </div>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="showReviewForm.set(!showReviewForm())"
+        >
+          {{ showReviewForm() ? 'Close Form' : 'Write a Review ★' }}
+        </button>
+      </div>
+
+      <!-- Interactive Write Review Form -->
+      @if (showReviewForm()) {
+        <form
+          (submit)="submitReview($event)"
+          class="review-form-card atelier-card"
+        >
+          <h3 class="form-title">Review this Curated Piece</h3>
+          <p class="form-desc">
+            Share feedback on texture, tailoring drape, and overall quality.
+          </p>
+
+          <div class="rating-stars-picker">
+            <span class="picker-label">Rating:</span>
+            <div class="stars-row">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+                <button
+                  type="button"
+                  class="star-btn"
+                  [class.selected]="newRating >= star"
+                  (click)="newRating = star"
+                >
+                  ★
+                </button>
+              }
+            </div>
+            <span class="selected-star-text">{{ newRating }} of 5 Stars</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name *</label>
+              <input
+                type="text"
+                [(ngModel)]="newAuthorName"
+                name="authorName"
+                required
+                placeholder="e.g. Kolawole Sanusi"
+                class="luxe-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>City & State *</label>
+              <input
+                type="text"
+                [(ngModel)]="newCity"
+                name="city"
+                required
+                placeholder="e.g. Victoria Island, Lagos"
+                class="luxe-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Review Comment *</label>
+            <textarea
+              [(ngModel)]="newComment"
+              name="comment"
+              required
+              rows="3"
+              placeholder="Describe the fabric weight, drape, how your tailor handled the material..."
+              class="luxe-input"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary submit-rev-btn">
+            Post Verified Review
+          </button>
+        </form>
+      }
+
+      <!-- Reviews List -->
+      @if (prod.reviews && prod.reviews.length > 0) {
+        <div class="reviews-list">
+          @for (rev of prod.reviews; track rev.id) {
+            <div class="review-card atelier-card">
+              <div class="review-top-row">
+                <div class="reviewer-meta">
+                  <strong class="rev-author">{{ rev.authorName }}</strong>
+                  <span class="rev-city">{{ rev.city }}</span>
+                  @if (rev.verifiedBuyer) {
+                    <span class="verified-tag">✓ VERIFIED PATRON</span>
+                  }
+                </div>
+                <span class="rev-date">{{ rev.date }}</span>
+              </div>
+
+              <div class="rev-stars">
+                @for (s of [1, 2, 3, 4, 5]; track s) {
+                  <span class="star" [class.filled]="s <= rev.rating">★</span>
+                }
+                @if (rev.fitFeedback) {
+                  <span class="fit-tag">{{ rev.fitFeedback }}</span>
+                }
+              </div>
+
+              <p class="rev-comment">{{ rev.comment }}</p>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-reviews-state atelier-card">
+          <p>
+            No customer reviews yet. Be the first patron to review this
+            exquisite textile.
+          </p>
+        </div>
+      }
+    </section>
+
+    <!-- ============================================== -->
+    <!-- FULL-WIDTH PINTEREST DISCOVERY WALL -->
+    <!-- ============================================== -->
+    <section class="related-products-section full-width-pinterest">
+      <div class="related-inner-container">
+        <div class="related-header-wrap">
+          <div class="kicker-row">
+            <span class="related-kicker"
+              >⚜ PINTEREST DISCOVERY WALL · CURATED PAIRINGS ⚜</span
+            >
+            <span class="slogan-badge">"Get a worth for ur class"</span>
+          </div>
+          <h2 class="related-title">
+            Recommended Fabrics, Senator Cuts & Curations
+          </h2>
+          <p class="related-subtitle">
+            Multi-column endless masonry discovery curated to complement the
+            texture, weave structure, and prestige of this piece
+          </p>
+        </div>
+
+        <div class="related-products-grid">
+          @for (rel of relatedProducts(); track rel.id) {
+            <div class="rel-grid-cell">
+              <atelier-product-card
+                [product]="rel"
+                [aspectRatio]="
+                  rel.aspectRatio === '16:9'
+                    ? '16 / 9'
+                    : rel.aspectRatio === '4:3'
+                      ? '4 / 3'
+                      : rel.aspectRatio === '1:1'
+                        ? '1 / 1'
+                        : rel.aspectRatio === '3:4'
+                          ? '3 / 4'
+                          : rel.aspectRatio === '2:3'
+                            ? '2 / 3'
+                            : '4 / 5'
+                "
+              />
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 400% Macro Weave Inspection Modal -->
+  @if (showMacroInspection()) {
+    <div class="macro-modal-overlay" (click)="showMacroInspection.set(false)">
+      <div class="macro-modal-viewport" (click)="$event.stopPropagation()">
+        <div class="macro-header">
+          <div>
+            <span class="modal-kicker"
+              >⚜ 400% OPTICAL MACRO FIBER INSPECTION ⚜</span
+            >
+            <h3 class="macro-title">{{ prod.title }}</h3>
+            <span class="slogan-micro">"Get a worth for ur class"</span>
+          </div>
+          <button
+            type="button"
+            class="macro-close-btn"
+            (click)="showMacroInspection.set(false)"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="macro-media-wrap">
+          <img
+            [src]="prod.featuredImage"
+            [alt]="prod.title"
+            class="macro-zoomed-img"
+          />
+          <div class="macro-reticle">
+            <span class="reticle-badge"
+              >400% HIGH RESOLUTION SCAN · CERTIFIED WEAVE</span
+            >
+          </div>
+        </div>
+        <div class="macro-footer">
+          <div class="macro-spec-col">
+            <span class="lbl">YARN TENSION</span>
+            <strong>42 PPI COMPACT</strong>
+          </div>
+          <div class="macro-spec-col">
+            <span class="lbl">DYE FASTNESS</span>
+            <strong>GRADE 5 REACTIVE</strong>
+          </div>
+          <div class="macro-spec-col">
+            <span class="lbl">TROPICAL WEIGHT</span>
+            <strong>HUMIDITY RESISTANT</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Fabric Calculator Modal -->
+  @if (showCalculator()) {
+    <atelier-fabric-calculator-modal
+      (close)="showCalculator.set(false)"
+      (applyYardage)="onYardageCalculated($event)"
+    />
+  }
+} @else {
+  <div class="pdp-not-found atelier-card">
+    <div class="loading-crest">⚜</div>
+    <h2>Loading Curated Piece...</h2>
+    <p>Calibrating certified mill provenance & drape dynamics...</p>
+    <a routerLink="/" class="btn-primary" style="margin-top: 16px"
+      >Browse All Curations</a
+    >
+  </div>
+}

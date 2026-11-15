@@ -1,0 +1,620 @@
+<div class="checkout-wrapper">
+  @if (checkoutStore.placedOrder(); as order) {
+    <!-- SUCCESS SCREEN: Order Complete & 1-Tap Member Upgrade -->
+    <div class="success-screen-card atelier-card">
+      <div class="success-icon-badge">✓</div>
+      <span class="success-eyebrow">ORDER CONFIRMED & PAYMENT VERIFIED</span>
+      <h1 class="success-title">
+        Thank you, {{ order.customerDetails.name }}!
+      </h1>
+      <p class="order-number-ref">
+        Order Reference: <strong>#{{ order.orderNumber }}</strong>
+      </p>
+
+      <div class="order-summary-box">
+        <div class="summary-line">
+          <span>Total Paid</span>
+          <strong class="price-display"
+            >₦{{ order.total.toLocaleString() }}</strong
+          >
+        </div>
+        <div class="summary-line">
+          <span>Payment Mode</span>
+          <span>{{ order.paymentMethod | uppercase }}</span>
+        </div>
+        <div class="summary-line">
+          <span>Delivery Destination</span>
+          <span
+            >{{ order.deliveryDetails.address }} ({{
+              order.deliveryDetails.lga
+            }}, {{ order.deliveryDetails.state }})</span
+          >
+        </div>
+      </div>
+
+      <!-- 1-Tap Silent Member Upgrade Prompt -->
+      @if (!memberSaved()) {
+        <div class="member-upgrade-card atelier-card">
+          <div class="upgrade-header">
+            <span class="sparkle-icon">✦</span>
+            <div>
+              <h3 class="upgrade-title">Save Your Teepha Account in 1-Tap</h3>
+              <p class="upgrade-sub">
+                You earned
+                <strong
+                  >+{{ (order.total * 0.05).toFixed(0) }} Loyalty Points</strong
+                >
+                and <strong>1 Free AI Style Studio Token</strong>! Verify phone
+                to unlock member privileges.
+              </p>
+            </div>
+          </div>
+
+          <div class="otp-row">
+            <input
+              type="text"
+              class="otp-input"
+              placeholder="Enter 4-digit code (e.g. 1904)"
+              [(ngModel)]="otpCode"
+              maxlength="4"
+            />
+            <button
+              type="button"
+              class="btn-primary"
+              (click)="verifyAndSaveAccount()"
+            >
+              Save Account & Claim Tokens
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="member-unlocked-banner">
+          ✦ Member Account Verified! Welcome to the
+          <strong>{{ authStore.loyaltyTier() }} Tier</strong>.
+        </div>
+      }
+
+      <!-- WhatsApp Tracking & Print Receipt Actions -->
+      <div class="tracking-actions-row">
+        <button
+          type="button"
+          class="btn-primary print-receipt-btn"
+          (click)="openInvoice()"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path
+              d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+            ></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          Print Wholesale Invoice / Receipt
+        </button>
+        <a
+          [href]="order.whatsappTrackingUrl"
+          target="_blank"
+          class="btn-secondary wa-track-btn"
+        >
+          Track Real-Time via WhatsApp ↗
+        </a>
+        <a routerLink="/" class="btn-secondary continue-btn">
+          Back to Catalog
+        </a>
+      </div>
+    </div>
+  } @else {
+    <!-- 3-STEP CHECKOUT FORM -->
+    <div class="checkout-layout">
+      <!-- Main Form Column -->
+      <div class="checkout-form-column">
+        <!-- 3-Segment Progress Bar -->
+        <div class="step-progress-indicator">
+          <div
+            class="step-seg"
+            [class.active]="checkoutStore.currentStep() >= 1"
+            [class.completed]="checkoutStore.currentStep() > 1"
+            (click)="checkoutStore.goToStep(1)"
+          >
+            <span class="step-num">1</span>
+            <span class="step-label">Details</span>
+          </div>
+          <div
+            class="step-connector"
+            [class.filled]="checkoutStore.currentStep() > 1"
+          ></div>
+          <div
+            class="step-seg"
+            [class.active]="checkoutStore.currentStep() >= 2"
+            [class.completed]="checkoutStore.currentStep() > 2"
+            (click)="canGoToStep2() && checkoutStore.goToStep(2)"
+          >
+            <span class="step-num">2</span>
+            <span class="step-label">Delivery & Pay</span>
+          </div>
+          <div
+            class="step-connector"
+            [class.filled]="checkoutStore.currentStep() > 2"
+          ></div>
+          <div
+            class="step-seg"
+            [class.active]="checkoutStore.currentStep() === 3"
+          >
+            <span class="step-num">3</span>
+            <span class="step-label">Review</span>
+          </div>
+        </div>
+
+        <!-- STEP 1: Details (Phone Mandatory & Lead Capture on Blur) -->
+        @if (checkoutStore.currentStep() === 1) {
+          <div class="step-pane">
+            <h2 class="pane-title">1. Contact & Delivery Details</h2>
+            <p class="pane-sub">
+              Guest-first checkout. We use your Nigerian phone number to safely
+              track your order.
+            </p>
+
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="input-label"
+                  >Nigerian Mobile Number * (Mandatory)</label
+                >
+                <div class="phone-input-wrap">
+                  <span class="phone-prefix">+234</span>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    placeholder="0803 123 4567"
+                    [ngModel]="checkoutStore.customerForm().phone"
+                    (ngModelChange)="onPhoneChange($event)"
+                    (blur)="onPhoneBlur()"
+                    required
+                  />
+                </div>
+                @if (phoneError()) {
+                  <span class="field-error"
+                    >Please enter a valid Nigerian mobile number.</span
+                  >
+                }
+              </div>
+
+              <div class="form-group">
+                <label class="input-label">Full Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. Boluwatife Farinu"
+                  [ngModel]="checkoutStore.customerForm().name"
+                  (ngModelChange)="checkoutStore.updateForm({ name: $event })"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="input-label"
+                  >Email Address (Optional for e-Receipt)</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  placeholder="e.g. name@example.com"
+                  [ngModel]="checkoutStore.customerForm().email"
+                  (ngModelChange)="checkoutStore.updateForm({ email: $event })"
+                  (blur)="checkoutStore.captureLeadOnBlur()"
+                />
+              </div>
+
+              <!-- Delivery Type Toggle -->
+              <div class="form-group full-width">
+                <label class="input-label">Fulfilment Preference</label>
+                <div class="delivery-type-toggle">
+                  <button
+                    type="button"
+                    class="type-btn"
+                    [class.active]="!checkoutStore.customerForm().isPickup"
+                    (click)="checkoutStore.updateForm({ isPickup: false })"
+                  >
+                    🚚 Doorstep Delivery (Lagos / Nationwide)
+                  </button>
+                  <button
+                    type="button"
+                    class="type-btn"
+                    [class.active]="checkoutStore.customerForm().isPickup"
+                    (click)="checkoutStore.updateForm({ isPickup: true })"
+                  >
+                    🏬 Store Pickup (Shagari Estate, Ipaja, Lagos)
+                  </button>
+                </div>
+              </div>
+
+              @if (!checkoutStore.customerForm().isPickup) {
+                <div class="form-group">
+                  <label class="input-label">State</label>
+                  <select
+                    class="form-control"
+                    [ngModel]="checkoutStore.customerForm().state"
+                    (ngModelChange)="
+                      checkoutStore.updateForm({ state: $event })
+                    "
+                  >
+                    <option value="Lagos">Lagos</option>
+                    <option value="Abuja FCT">Abuja FCT</option>
+                    <option value="Rivers">Rivers (Port Harcourt)</option>
+                    <option value="Oyo">Oyo (Ibadan)</option>
+                    <option value="Ogun">Ogun</option>
+                    <option value="Enugu">Enugu</option>
+                    <option value="Delta">Delta</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="input-label">LGA / District *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="e.g. Ikeja, Eti-Osa, Surulere"
+                    [ngModel]="checkoutStore.customerForm().lga"
+                    (ngModelChange)="checkoutStore.updateForm({ lga: $event })"
+                  />
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="input-label">Street Address *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="House / Plot number, Street name"
+                    [ngModel]="checkoutStore.customerForm().address"
+                    (ngModelChange)="
+                      checkoutStore.updateForm({ address: $event })
+                    "
+                  />
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="input-label"
+                    >Closest Landmark / Special Notes</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="e.g. Beside Zenith Bank, opposite Total Filling Station"
+                    [ngModel]="checkoutStore.customerForm().landmark"
+                    (ngModelChange)="
+                      checkoutStore.updateForm({ landmark: $event })
+                    "
+                  />
+                </div>
+              }
+            </div>
+
+            <div class="step-actions">
+              <button
+                type="button"
+                class="btn-primary proceed-btn"
+                [disabled]="!isStep1Valid()"
+                (click)="goToStep2()"
+              >
+                Continue to Delivery & Payment →
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- STEP 2: Delivery Speed & Payment Method -->
+        @if (checkoutStore.currentStep() === 2) {
+          <div class="step-pane">
+            <h2 class="pane-title">2. Select Delivery & Payment Method</h2>
+
+            @if (!checkoutStore.customerForm().isPickup) {
+              <label class="input-label">Dispatch Speed</label>
+              <div class="options-choice-grid">
+                <div
+                  class="choice-card atelier-card"
+                  [class.active]="
+                    checkoutStore.deliverySpeed() === 'lagos_same_day'
+                  "
+                  (click)="checkoutStore.deliverySpeed.set('lagos_same_day')"
+                >
+                  <div class="choice-content">
+                    <strong>Lagos Same-Day Priority (Dispatch Rider)</strong>
+                    <p>Order arrives today between 3:00 PM – 6:00 PM</p>
+                  </div>
+                  <span class="choice-price price-display">
+                    {{ cartStore.hasFreeDelivery() ? 'FREE' : '₦3,500' }}
+                  </span>
+                </div>
+
+                <div
+                  class="choice-card atelier-card"
+                  [class.active]="
+                    checkoutStore.deliverySpeed() === 'standard_nigeria'
+                  "
+                  (click)="checkoutStore.deliverySpeed.set('standard_nigeria')"
+                >
+                  <div class="choice-content">
+                    <strong>Standard Nationwide Courier</strong>
+                    <p>2 - 4 business days across Nigeria</p>
+                  </div>
+                  <span class="choice-price price-display">
+                    {{ cartStore.hasFreeDelivery() ? 'FREE' : '₦5,000' }}
+                  </span>
+                </div>
+              </div>
+            }
+
+            <label class="input-label" style="margin-top: 24px"
+              >Payment Gateway / Method</label
+            >
+            <div class="payment-methods-grid">
+              <!-- Method 1: Instant Bank Transfer -->
+              <div
+                class="pay-method-card atelier-card"
+                [class.active]="
+                  checkoutStore.paymentMethod() === 'bank_transfer'
+                "
+                (click)="checkoutStore.paymentMethod.set('bank_transfer')"
+              >
+                <div class="method-header">
+                  <span class="radio-dot"></span>
+                  <strong
+                    >Instant Bank Transfer (Zero Failed Transactions)</strong
+                  >
+                </div>
+                <p class="method-desc">
+                  A dedicated virtual account is generated instantly. Transfer
+                  from any Nigerian banking app.
+                </p>
+              </div>
+
+              <!-- Method 2: Debit Card -->
+              <div
+                class="pay-method-card atelier-card"
+                [class.active]="checkoutStore.paymentMethod() === 'card'"
+                (click)="checkoutStore.paymentMethod.set('card')"
+              >
+                <div class="method-header">
+                  <span class="radio-dot"></span>
+                  <strong>Debit Card (Mastercard / Visa / Verve)</strong>
+                </div>
+                <p class="method-desc">
+                  Secured via 256-bit bank-grade encryption & 3DS OTP.
+                </p>
+              </div>
+
+              <!-- Method 3: USSD -->
+              <div
+                class="pay-method-card atelier-card"
+                [class.active]="checkoutStore.paymentMethod() === 'ussd'"
+                (click)="checkoutStore.paymentMethod.set('ussd')"
+              >
+                <div class="method-header">
+                  <span class="radio-dot"></span>
+                  <strong>USSD (*737#, *894#, *901#)</strong>
+                </div>
+                <p class="method-desc">
+                  Pay instantly directly from your phone keypad.
+                </p>
+              </div>
+            </div>
+
+            <!-- Instant Virtual Account Box if Bank Transfer Selected -->
+            @if (checkoutStore.paymentMethod() === 'bank_transfer') {
+              <div class="virtual-account-box atelier-card">
+                <div class="va-header">
+                  <span class="va-badge">DEDICATED CHECKOUT ACCOUNT</span>
+                  <span class="va-timer">Expires in 30 mins</span>
+                </div>
+
+                <div class="va-details-row">
+                  <div class="va-field">
+                    <span class="field-label">Bank Name</span>
+                    <strong class="field-val">{{
+                      checkoutStore.virtualAccount().bankName
+                    }}</strong>
+                  </div>
+                  <div class="va-field">
+                    <span class="field-label">Account Number</span>
+                    <div class="copy-acc-wrap">
+                      <strong class="acc-num price-display">{{
+                        checkoutStore.virtualAccount().accountNumber
+                      }}</strong>
+                      <button
+                        type="button"
+                        class="copy-btn"
+                        (click)="copyAccount()"
+                      >
+                        {{ copied() ? 'Copied ✓' : 'Copy' }}
+                      </button>
+                    </div>
+                  </div>
+                  <div class="va-field">
+                    <span class="field-label">Account Name</span>
+                    <strong class="field-val">{{
+                      checkoutStore.virtualAccount().accountName
+                    }}</strong>
+                  </div>
+                </div>
+                <p class="va-instruction">
+                  Payment is automatically detected via WebSocket within 5
+                  seconds of transfer completion.
+                </p>
+              </div>
+            }
+
+            <div class="step-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="checkoutStore.goToStep(1)"
+              >
+                ← Back to Details
+              </button>
+              <button
+                type="button"
+                class="btn-primary proceed-btn"
+                (click)="checkoutStore.goToStep(3)"
+              >
+                Review Order & Pay →
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- STEP 3: Final Review & Pay -->
+        @if (checkoutStore.currentStep() === 3) {
+          <div class="step-pane">
+            <h2 class="pane-title">3. Review & Authorize Payment</h2>
+
+            <div class="review-box atelier-card">
+              <div class="review-section">
+                <span class="sec-label">CUSTOMER DETAILS</span>
+                <strong
+                  >{{ checkoutStore.customerForm().name }} ({{
+                    checkoutStore.customerForm().phone
+                  }})</strong
+                >
+                @if (checkoutStore.customerForm().email) {
+                  <p class="sec-sub">
+                    {{ checkoutStore.customerForm().email }}
+                  </p>
+                }
+              </div>
+
+              <div class="review-section">
+                <span class="sec-label">DELIVERY DESTINATION</span>
+                <strong>
+                  {{
+                    checkoutStore.customerForm().isPickup
+                      ? 'Physical Store Pickup (Ipaja, Lagos)'
+                      : checkoutStore.customerForm().address
+                  }}
+                </strong>
+                <p class="sec-sub">
+                  {{ checkoutStore.customerForm().lga }},
+                  {{ checkoutStore.customerForm().state }}
+                </p>
+              </div>
+
+              <div class="review-section">
+                <span class="sec-label">PAYMENT METHOD</span>
+                <strong>{{ checkoutStore.paymentMethod() | uppercase }}</strong>
+              </div>
+            </div>
+
+            <div class="step-actions" style="margin-top: 32px">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="checkoutStore.goToStep(2)"
+              >
+                ← Modify
+              </button>
+              <button
+                type="button"
+                class="btn-primary pay-now-btn"
+                [disabled]="checkoutStore.isSubmitting()"
+                (click)="confirmPayment()"
+              >
+                @if (checkoutStore.isSubmitting()) {
+                  Processing Payment...
+                } @else {
+                  Authorize & Pay ₦{{ checkoutStore.total().toLocaleString() }}
+                  →
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Order Summary Sidebar Column -->
+      <div class="checkout-summary-column">
+        <div class="summary-card atelier-card">
+          <h3 class="summary-title">Order Breakdown</h3>
+
+          <div class="summary-items-list">
+            @for (item of cartStore.items(); track item.id) {
+              <div class="summary-item-row">
+                <div class="summary-item-img">
+                  <img [src]="item.image" [alt]="item.productTitle" />
+                </div>
+                <div class="summary-item-info">
+                  <span class="item-name">{{ item.productTitle }}</span>
+                  <span class="item-qty-color">
+                    {{ item.quantity }}
+                    {{ item.unit === 'yard' ? 'yds' : 'pc' }} ·
+                    {{ item.selectedColor }}
+                  </span>
+                </div>
+                <span class="item-total price-display">
+                  ₦{{ item.lineTotal.toLocaleString() }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- Promo Code Input -->
+          <div class="promo-box">
+            <input
+              type="text"
+              class="promo-input"
+              placeholder="Promo code (e.g. ATELIER10)"
+              [(ngModel)]="promoInput"
+            />
+            <button
+              type="button"
+              class="btn-secondary apply-promo-btn"
+              (click)="applyPromo()"
+            >
+              Apply
+            </button>
+          </div>
+          @if (promoSuccess()) {
+            <span class="promo-success-pill">✓ 10% Discount Applied!</span>
+          }
+
+          <!-- Pricing Totals Table -->
+          <div class="totals-table price-display">
+            <div class="total-line">
+              <span>Subtotal</span>
+              <span>₦{{ cartStore.subtotal().toLocaleString() }}</span>
+            </div>
+            <div class="total-line">
+              <span>Estimated Delivery</span>
+              <span>{{
+                checkoutStore.deliveryFee() === 0
+                  ? 'FREE'
+                  : '₦' + checkoutStore.deliveryFee().toLocaleString()
+              }}</span>
+            </div>
+            @if (checkoutStore.discountAmount() > 0) {
+              <div class="total-line discount-line">
+                <span>Discount</span>
+                <span
+                  >−₦{{ checkoutStore.discountAmount().toLocaleString() }}</span
+                >
+              </div>
+            }
+            <div class="total-line final-total-row">
+              <span>Final Total</span>
+              <span class="final-price"
+                >₦{{ checkoutStore.total().toLocaleString() }}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Wholesale Invoice / PDF Receipt Modal -->
+  @if (showInvoiceModal() && invoiceData()) {
+    <atelier-invoice-modal [order]="invoiceData()!" (close)="closeInvoice()" />
+  }
+</div>

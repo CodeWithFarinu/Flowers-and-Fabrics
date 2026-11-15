@@ -1,0 +1,412 @@
+<div class="admin-page-container">
+  <!-- Page Header & Live Pulse -->
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">COMMAND VAULT INTELLIGENCE</span>
+      <h1 class="page-title">Executive Intelligence & Velocity Analytics</h1>
+    </div>
+
+    <div class="header-badges">
+      <div class="live-visitors-badge atelier-card">
+        <span class="live-dot"></span>
+        <strong
+          >{{ adminStore.metrics().liveVisitors }} Active Patrons Online</strong
+        >
+      </div>
+      <span class="vault-tag">LAGOS VAULT · ALL REPLICAS SYNCED</span>
+    </div>
+  </div>
+
+  <!-- Multi-Parameter Query Toolbar -->
+  <div class="query-toolbar atelier-card">
+    <!-- Timeframe Selector -->
+    <div class="toolbar-group">
+      <span class="toolbar-label">Timeframe:</span>
+      <div class="pill-group">
+        <button
+          type="button"
+          class="tf-btn"
+          [class.active]="adminStore.selectedTimeframe() === '24h'"
+          (click)="setTimeframe('24h')"
+        >
+          24h
+        </button>
+        <button
+          type="button"
+          class="tf-btn"
+          [class.active]="adminStore.selectedTimeframe() === '7d'"
+          (click)="setTimeframe('7d')"
+        >
+          7d
+        </button>
+        <button
+          type="button"
+          class="tf-btn"
+          [class.active]="adminStore.selectedTimeframe() === '30d'"
+          (click)="setTimeframe('30d')"
+        >
+          30d
+        </button>
+        <button
+          type="button"
+          class="tf-btn"
+          [class.active]="adminStore.selectedTimeframe() === 'quarter'"
+          (click)="setTimeframe('quarter')"
+        >
+          Quarter
+        </button>
+        <button
+          type="button"
+          class="tf-btn"
+          [class.active]="adminStore.selectedTimeframe() === 'ytd'"
+          (click)="setTimeframe('ytd')"
+        >
+          YTD
+        </button>
+      </div>
+    </div>
+
+    <!-- Sales Channel Query -->
+    <div class="toolbar-group">
+      <span class="toolbar-label">Channel:</span>
+      <select
+        class="query-select"
+        [ngModel]="adminStore.selectedChannel()"
+        (ngModelChange)="adminStore.setChannel($event)"
+      >
+        <option value="all">All Channels (Omnichannel)</option>
+        <option value="meta_ads">Meta & Facebook Ads (ROAS 4.8x)</option>
+        <option value="instagram">Instagram Story & Direct</option>
+        <option value="tiktok">TikTok Streetwear Editorial</option>
+        <option value="whatsapp">VIP WhatsApp Concierge</option>
+      </select>
+    </div>
+
+    <!-- Category Query -->
+    <div class="toolbar-group">
+      <span class="toolbar-label">Category:</span>
+      <select
+        class="query-select"
+        [ngModel]="adminStore.selectedCategory()"
+        (ngModelChange)="adminStore.setCategory($event)"
+      >
+        <option value="all">All Luxury Categories</option>
+        <option value="fabrics">Fabrics (Cashmere, Voile & Lace)</option>
+        <option value="flowers">Luxury Flowers & Bridal Bouquets</option>
+        <option value="accessories">Horology & Sovereign Cufflinks</option>
+        <option value="sneakers">Bespoke Footwear & Sneakers</option>
+      </select>
+    </div>
+
+    <!-- Region Query -->
+    <div class="toolbar-group">
+      <span class="toolbar-label">Territory:</span>
+      <select
+        class="query-select"
+        [ngModel]="adminStore.selectedRegion()"
+        (ngModelChange)="adminStore.setRegion($event)"
+      >
+        <option value="all">All Territories</option>
+        <option value="lagos">Lagos (Island & Mainland)</option>
+        <option value="abuja">Abuja FCT (Maitama & Asokoro)</option>
+        <option value="rivers">Rivers (Port Harcourt)</option>
+        <option value="diaspora">Diaspora (UK, US, Canada)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- KPI Summary Metric Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Gross Merchandise Value (GMV)</span>
+      <div class="kpi-val price-display">
+        ₦{{ adminStore.metrics().totalGmv.toLocaleString() }}
+      </div>
+      <span class="kpi-trend positive">
+        +{{ adminStore.metrics().gmvGrowth }}% vs previous period
+      </span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Verified Order Volume</span>
+      <div class="kpi-val price-display">
+        {{ adminStore.metrics().totalOrders }}
+      </div>
+      <span class="kpi-trend positive">
+        +{{ adminStore.metrics().ordersGrowth }}% Velocity
+      </span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Average Order Value (AOV)</span>
+      <div class="kpi-val price-display">
+        ₦{{ adminStore.metrics().averageOrderValue.toLocaleString() }}
+      </div>
+      <span class="kpi-trend neutral">Multi-yard Senator & Lace cuts</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Checkout Conversion Rate</span>
+      <div class="kpi-val price-display">
+        {{ adminStore.metrics().conversionRate }}%
+      </div>
+      <span class="kpi-trend positive">Benchmarked vs Luxury Ecommerce</span>
+    </div>
+  </div>
+
+  <!-- Main Interactive SVG Velocity Chart -->
+  <div class="chart-card atelier-card">
+    <div class="chart-header">
+      <div>
+        <h2 class="chart-title">Revenue Velocity & Settlement Curve</h2>
+        <span class="chart-subtitle">
+          Calculated for
+          {{ adminStore.selectedTimeframe() | uppercase }} across
+          {{ adminStore.selectedRegion() | uppercase }}
+        </span>
+      </div>
+
+      @if (hoveredPoint()) {
+        <div class="hover-tooltip">
+          <span class="tooltip-label">{{ hoveredPoint()!.label }}:</span>
+          <strong class="tooltip-val price-display"
+            >₦{{ hoveredPoint()!.value.toLocaleString() }}</strong
+          >
+        </div>
+      }
+    </div>
+
+    <!-- SVG Mathematical Area Chart -->
+    <div class="svg-chart-container">
+      <svg
+        class="velocity-svg"
+        viewBox="0 0 800 240"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <linearGradient id="gmvAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#10B981" stop-opacity="0.32" />
+            <stop offset="100%" stop-color="#10B981" stop-opacity="0.0" />
+          </linearGradient>
+        </defs>
+
+        <!-- Horizontal Gridlines -->
+        <line
+          x1="0"
+          y1="40"
+          x2="800"
+          y2="40"
+          stroke="var(--border)"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="0"
+          y1="100"
+          x2="800"
+          y2="100"
+          stroke="var(--border)"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="0"
+          y1="160"
+          x2="800"
+          y2="160"
+          stroke="var(--border)"
+          stroke-dasharray="3,3"
+        />
+        <line x1="0" y1="220" x2="800" y2="220" stroke="var(--border)" />
+
+        <!-- Area Fill -->
+        <path [attr.d]="svgAreaPath()" fill="url(#gmvAreaGrad)" />
+
+        <!-- Stroke Line -->
+        <path
+          [attr.d]="svgLinePath()"
+          fill="none"
+          stroke="#10B981"
+          stroke-width="2.5"
+        />
+
+        <!-- Interactive Plot Points -->
+        @for (pt of chartPoints(); track pt.label) {
+          <circle
+            [attr.cx]="pt.x"
+            [attr.cy]="pt.y"
+            r="4.5"
+            class="chart-circle"
+            (mouseenter)="hoveredPoint.set(pt)"
+            (mouseleave)="hoveredPoint.set(null)"
+          />
+        }
+      </svg>
+
+      <!-- X-Axis Labels -->
+      <div class="x-axis-labels">
+        @for (pt of chartPoints(); track pt.label) {
+          <span class="x-label">{{ pt.label }}</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary Analytics Row: Yardage Volume & Lead Funnel -->
+  <div class="analytics-row">
+    <!-- Lead Progression Funnel -->
+    <div class="funnel-card atelier-card">
+      <h3 class="card-title">Lead Acquisition & Onboarding Funnel</h3>
+      <p class="card-desc">
+        Tracking Nigerian phone captures on blur vs checkout completion and OTP
+        member verification.
+      </p>
+
+      <div class="funnel-bars">
+        <div class="funnel-step">
+          <div class="step-label-row">
+            <span>1. Phone Captured (LEADS)</span>
+            <strong>{{ adminStore.metrics().leadsFunnel.totalLeads }}</strong>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <div class="funnel-step">
+          <div class="step-label-row">
+            <span>2. Completed 3-Step Checkout (SHADOW)</span>
+            <strong
+              >{{
+                adminStore.metrics().leadsFunnel.shadowAccounts
+              }}
+              (33.7%)</strong
+            >
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: 33.7%"></div>
+          </div>
+        </div>
+
+        <div class="funnel-step">
+          <div class="step-label-row">
+            <span>3. 1-Tap OTP Verified (MEMBERS)</span>
+            <strong
+              >{{
+                adminStore.metrics().leadsFunnel.convertedMembers
+              }}
+              (22.4%)</strong
+            >
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: 22.4%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paid Traffic Attribution -->
+    <div class="channel-card atelier-card">
+      <h3 class="card-title">Paid Traffic Attribution (ROAS)</h3>
+      <p class="card-desc">
+        Revenue mapped to ad campaigns via UTM & tracking links.
+      </p>
+
+      <div class="channel-list">
+        @for (ch of adminStore.metrics().channelRevenue; track ch.channel) {
+          <div class="channel-item">
+            <div class="channel-info">
+              <strong>{{ ch.channel }}</strong>
+              <span class="price-display">
+                ₦{{ ch.revenue.toLocaleString() }} ({{ ch.percentage }}%)
+              </span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="ch.percentage"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders Table -->
+  <div class="recent-orders-card atelier-card">
+    <div class="orders-header">
+      <div>
+        <h3 class="card-title">Recent Transactions & Fulfilment Status</h3>
+        <span class="card-desc"
+          >Latest purchases placed across web and mobile apps.</span
+        >
+      </div>
+      <a routerLink="/orders" class="btn-secondary view-all-btn"
+        >Open Kanban Board →</a
+      >
+    </div>
+
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Order Ref</th>
+            <th>Patron Details</th>
+            <th>Destination</th>
+            <th>Total Value</th>
+            <th>Payment Mode</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ord of adminStore.orders(); track ord.id) {
+            <tr>
+              <td>
+                <strong>#{{ ord.orderNumber }}</strong>
+                <div class="sub-date">
+                  {{ ord.createdAt | date: 'shortTime' }}
+                </div>
+              </td>
+              <td>
+                <div class="cust-info">
+                  <strong>{{ ord.customerDetails.name }}</strong>
+                  <small>{{ ord.customerDetails.phone }}</small>
+                </div>
+              </td>
+              <td>
+                <span class="zone-text"
+                  >{{ ord.deliveryDetails.lga }},
+                  {{ ord.deliveryDetails.state }}</span
+                >
+              </td>
+              <td class="price-display font-bold">
+                ₦{{ ord.total.toLocaleString() }}
+              </td>
+              <td>
+                <span class="pay-method-badge">{{
+                  ord.paymentMethod | uppercase
+                }}</span>
+              </td>
+              <td>
+                <span
+                  class="status-pill"
+                  [class.confirmed]="ord.status === 'confirmed'"
+                  [class.packed]="ord.status === 'packed'"
+                  [class.shipped]="ord.status === 'shipped'"
+                >
+                  ● {{ ord.status | uppercase }}
+                </span>
+              </td>
+              <td>
+                <a
+                  [href]="ord.whatsappTrackingUrl"
+                  target="_blank"
+                  class="btn-ghost mini-btn wa-link"
+                >
+                  WhatsApp ↗
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

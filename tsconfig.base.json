@@ -17,7 +17,13 @@
     "paths": {
       "utils": ["./libs/shared/utils/src/index.ts"],
       "types": ["./libs/shared/types/src/index.ts"],
-      "constants": ["./libs/shared/constants/src/index.ts"]
+      "constants": ["./libs/shared/constants/src/index.ts"],
+      "@shared/tokens": ["./libs/shared/ui-tokens/src/index.ts"],
+      "@shared/models": ["./libs/shared/models/src/index.ts"],
+      "@shared/analytics": ["./libs/shared/analytics/src/index.ts"],
+      "@shared/data-access": ["./libs/shared/data-access/src/index.ts"],
+      "@shared/ui": ["./libs/shared/ui/src/index.ts"],
+      "@shared/prisma": ["./libs/shared/prisma/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,0 +1,180 @@
+.mobile-studio-padding {
+  padding: 16px 16px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.token-banner {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: var(--radius-sm);
+}
+
+.token-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sparkle {
+  font-size: 1.25rem;
+  color: var(--accent-gold);
+}
+
+.token-info strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.token-info small {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.m-gen-box {
+  padding: 48px 20px;
+  text-align: center;
+  border-radius: var(--radius-md);
+}
+
+.spin-sparkle {
+  font-size: 2rem;
+  color: var(--accent-gold);
+  animation: spin 3s linear infinite;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.m-gen-box strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.m-gen-box p {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.m-result-card {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.m-img-wrap {
+  position: relative;
+  height: 380px;
+  background: var(--surface);
+}
+
+.m-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.m-fidelity-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.m-res-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.m-res-body strong {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.m-res-body p {
+  margin: 0 0 12px;
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}
+
+.m-form-card {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.m-label {
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.m-select,
+.m-input {
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.m-garments-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.m-garm-btn {
+  white-space: nowrap;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.m-garm-btn.active {
+  background: var(--inverse-bg);
+  color: var(--inverse-text);
+  border-color: var(--inverse-bg);
+}
+
+.full-w-btn {
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+}
+
+.gen-submit-btn {
+  margin-top: 18px;
+  font-size: 0.9rem;
+}

@@ -1,0 +1,526 @@
+<div class="admin-page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">CLIENTELE & PATRON DIRECTORATE</span>
+      <h1 class="page-title">Patrons, VIP Sovereign Tiers & Guest Leads</h1>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="showAddModal.set(true)"
+      >
+        + Register VIP Patron
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Summary Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Active Sovereign & Executive VIPs</span>
+      <div class="kpi-val price-display">{{ sovereignVipsCount() }}</div>
+      <span class="kpi-trend positive">Highest AOV patron segment</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Total Verified Patrons</span>
+      <div class="kpi-val price-display">
+        {{ adminStore.customers().length }}
+      </div>
+      <span class="kpi-trend neutral">Across Lagos, Abuja & Diaspora</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Shadow-to-Member Conversion</span>
+      <div class="kpi-val price-display">33.7%</div>
+      <span class="kpi-trend positive">+4.2% MoM post-checkout OTP</span>
+    </div>
+
+    <div class="kpi-card atelier-card">
+      <span class="kpi-label">Cumulative Patron Lifetime Spend</span>
+      <div class="kpi-val price-display">
+        ₦{{ totalLifetimeSpend().toLocaleString() }}
+      </div>
+      <span class="kpi-trend positive">Verified NGN settlement</span>
+    </div>
+  </div>
+
+  <!-- Filters & Search Toolbar -->
+  <div class="table-toolbar atelier-card">
+    <div class="search-wrap">
+      <svg
+        class="search-icon"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search patrons by name, phone (+234...), or email..."
+        [(ngModel)]="searchQuery"
+      />
+    </div>
+
+    <div class="filter-pills">
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedTierFilter() === 'ALL'"
+        (click)="selectedTierFilter.set('ALL')"
+      >
+        All Patrons
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedTierFilter() === 'SOVEREIGN'"
+        (click)="selectedTierFilter.set('SOVEREIGN')"
+      >
+        Sovereign VIP
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedTierFilter() === 'EXECUTIVE'"
+        (click)="selectedTierFilter.set('EXECUTIVE')"
+      >
+        Executive
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedTierFilter() === 'CONNOISSEUR'"
+        (click)="selectedTierFilter.set('CONNOISSEUR')"
+      >
+        Connoisseur
+      </button>
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="selectedTierFilter() === 'SHADOW'"
+        (click)="selectedTierFilter.set('SHADOW')"
+      >
+        Shadow Leads
+      </button>
+    </div>
+  </div>
+
+  <!-- Patrons Master Table -->
+  <div class="table-card atelier-card">
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Patron / Monogram</th>
+            <th>VIP Status & Tier</th>
+            <th>Account State</th>
+            <th>Phone & Email</th>
+            <th>Lifetime Spend</th>
+            <th>Orders</th>
+            <th>AI Tokens</th>
+            <th>Loyalty Points</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cust of filteredCustomers(); track cust.id) {
+            <tr>
+              <td>
+                <div class="patron-cell">
+                  <div class="monogram-avatar">
+                    {{ getInitials(cust.name || 'GP') }}
+                  </div>
+                  <div class="patron-meta">
+                    <strong class="patron-name">{{
+                      cust.name || 'Unnamed Guest Lead'
+                    }}</strong>
+                    <span class="patron-city">
+                      {{
+                        cust.addresses.length
+                          ? cust.addresses[0].state
+                          : 'Lagos Online'
+                      }}
+                      · {{ cust.lastActive || 'Recent' }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span
+                  class="vip-pill"
+                  [class.sovereign]="cust.vipStatus === 'Sovereign'"
+                  [class.executive]="cust.vipStatus === 'Executive'"
+                  [class.connoisseur]="cust.vipStatus === 'Connoisseur'"
+                >
+                  ✦ {{ cust.vipStatus || 'Member' }} ({{ cust.loyaltyTier }})
+                </span>
+              </td>
+              <td>
+                <span
+                  class="state-pill"
+                  [class.member]="cust.accountState === 'MEMBER'"
+                  [class.shadow]="cust.accountState === 'SHADOW'"
+                  [class.lead]="cust.accountState === 'LEAD'"
+                >
+                  ● {{ cust.accountState }}
+                </span>
+              </td>
+              <td>
+                <div class="contact-meta">
+                  <strong>{{ cust.phone }}</strong>
+                  <small>{{ cust.email || 'No email registered' }}</small>
+                </div>
+              </td>
+              <td class="price-display font-semibold">
+                ₦{{ (cust.totalSpend || 0).toLocaleString() }}
+              </td>
+              <td class="orders-count-cell">
+                {{ cust.ordersCount || 0 }}
+              </td>
+              <td>
+                <span class="token-pill">
+                  ✦ {{ cust.aiTokenBalance }} Tokens
+                </span>
+              </td>
+              <td>
+                <span class="points-pill">
+                  {{ (cust.loyaltyPoints || 0).toLocaleString() }} pts
+                </span>
+              </td>
+              <td>
+                <div class="action-btn-group">
+                  <button
+                    type="button"
+                    class="btn-ghost mini-btn"
+                    (click)="openAdjustModal(cust)"
+                    title="Top up AI tokens or adjust loyalty points"
+                  >
+                    Adjust
+                  </button>
+
+                  @if (
+                    cust.accountState === 'SHADOW' ||
+                    cust.accountState === 'LEAD'
+                  ) {
+                    <button
+                      type="button"
+                      class="btn-primary mini-btn"
+                      (click)="openConvertModal(cust)"
+                    >
+                      Convert
+                    </button>
+                  }
+
+                  <a
+                    [href]="getWhatsAppLink(cust.phone, cust.name)"
+                    target="_blank"
+                    class="btn-ghost mini-btn wa-btn"
+                    title="Direct VIP WhatsApp message"
+                  >
+                    WhatsApp ↗
+                  </a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Adjust Tokens & Loyalty Points -->
+@if (selectedCustomerForAdjust(); as cust) {
+  <div class="modal-backdrop" (click)="selectedCustomerForAdjust.set(null)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">VIP PRIVILEGE MANAGEMENT</span>
+          <h3 class="modal-title">Adjust Rewards: {{ cust.name }}</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="selectedCustomerForAdjust.set(null)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="balance-summary">
+          <div class="summary-chip">
+            <span>Current AI Tokens</span>
+            <strong>{{ cust.aiTokenBalance }}</strong>
+          </div>
+          <div class="summary-chip">
+            <span>Current Loyalty Points</span>
+            <strong>{{ cust.loyaltyPoints.toLocaleString() }}</strong>
+          </div>
+          <div class="summary-chip">
+            <span>VIP Tier</span>
+            <strong>{{ cust.vipStatus || 'Member' }}</strong>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Add / Deduct AI Studio Design Tokens</label>
+          <div class="stepper-row">
+            <button
+              type="button"
+              class="step-btn"
+              (click)="adjustTokensDelta(-1)"
+            >
+              -1
+            </button>
+            <input type="number" class="step-input" [(ngModel)]="tokenDelta" />
+            <button
+              type="button"
+              class="step-btn"
+              (click)="adjustTokensDelta(1)"
+            >
+              +1
+            </button>
+            <button
+              type="button"
+              class="step-btn"
+              (click)="adjustTokensDelta(5)"
+            >
+              +5
+            </button>
+          </div>
+          <span class="form-hint"
+            >Grants complimentary photorealistic model draping trials.</span
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Add / Deduct Loyalty Points</label>
+          <div class="stepper-row">
+            <button
+              type="button"
+              class="step-btn"
+              (click)="adjustPointsDelta(-500)"
+            >
+              -500
+            </button>
+            <input type="number" class="step-input" [(ngModel)]="pointsDelta" />
+            <button
+              type="button"
+              class="step-btn"
+              (click)="adjustPointsDelta(500)"
+            >
+              +500
+            </button>
+            <button
+              type="button"
+              class="step-btn"
+              (click)="adjustPointsDelta(2000)"
+            >
+              +2,000
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Change VIP Status Tier</label>
+          <select class="form-select" [(ngModel)]="selectedNewTier">
+            <option value="Atelier">
+              Sovereign (Teepha Sovereign Tier - 25% guild privilege)
+            </option>
+            <option value="Tailor">
+              Executive (Tailor Tier - 15% guild privilege)
+            </option>
+            <option value="Stitch">
+              Connoisseur (Stitch Tier - 10% privilege)
+            </option>
+            <option value="Thread">Member (Thread Tier - Standard)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="selectedCustomerForAdjust.set(null)"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn-primary" (click)="saveAdjustments()">
+          Apply VIP Privileges
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal: Register New VIP Patron -->
+@if (showAddModal()) {
+  <div class="modal-backdrop" (click)="showAddModal.set(false)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">PRIVATE CLIENT REGISTRATION</span>
+          <h3 class="modal-title">Register Sovereign VIP Patron</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="showAddModal.set(false)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Full Name & Title *</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="e.g. Otunba Babatunde Doherty"
+            [(ngModel)]="newPatronName"
+          />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Phone Number (+234 E.164) *</label>
+            <input
+              type="tel"
+              class="form-input"
+              placeholder="+23480..."
+              [(ngModel)]="newPatronPhone"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input
+              type="email"
+              class="form-input"
+              placeholder="patron@domain.ng"
+              [(ngModel)]="newPatronEmail"
+            />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">VIP Status Tier</label>
+            <select class="form-select" [(ngModel)]="newPatronTier">
+              <option value="Sovereign">
+                Sovereign VIP (Teepha Sovereign Tier)
+              </option>
+              <option value="Executive">Executive VIP (Tailor Tier)</option>
+              <option value="Connoisseur">Connoisseur (Stitch Tier)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary State</label>
+            <select class="form-select" [(ngModel)]="newPatronState">
+              <option value="Lagos">Lagos (Island / Mainland)</option>
+              <option value="Abuja FCT">Abuja FCT</option>
+              <option value="Rivers">Rivers (Port Harcourt)</option>
+              <option value="Diaspora UK/US">Diaspora (UK / US)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Initial Complimentary AI Tokens</label>
+          <input
+            type="number"
+            class="form-input"
+            [(ngModel)]="newPatronTokens"
+          />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="showAddModal.set(false)"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn-primary" (click)="saveNewPatron()">
+          Register Patron
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal: Convert Shadow Lead -->
+@if (selectedCustomerForConvert(); as shadow) {
+  <div class="modal-backdrop" (click)="selectedCustomerForConvert.set(null)">
+    <div class="modal-box atelier-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">LEAD CONVERSION ENGINE</span>
+          <h3 class="modal-title">Convert Guest Lead to Full Member</h3>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="selectedCustomerForConvert.set(null)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="convert-desc">
+          Customer phone <strong>{{ shadow.phone }}</strong> captured during
+          checkout. Converting will grant 2 bonus AI design tokens and initiate
+          an automated WhatsApp welcome key.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Patron Full Name</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="e.g. Dr. Kemi Balogun"
+            [(ngModel)]="convertName"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Patron Email</label>
+          <input
+            type="email"
+            class="form-input"
+            placeholder="kemi@corporate.ng"
+            [(ngModel)]="convertEmail"
+          />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-ghost"
+          (click)="selectedCustomerForConvert.set(null)"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn-primary" (click)="confirmConvert()">
+          Convert & Activate Member
+        </button>
+      </div>
+    </div>
+  </div>
+}

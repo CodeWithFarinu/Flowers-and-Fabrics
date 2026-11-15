@@ -1,0 +1,139 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="mobile-toolbar glass-header">
+    <ion-title>
+      <div class="mobile-brand">
+        <svg
+          class="brand-monogram-svg"
+          width="24"
+          height="24"
+          viewBox="0 0 48 48"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="tfMobGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FDE68A" />
+              <stop offset="30%" stop-color="#F59E0B" />
+              <stop offset="70%" stop-color="#D97706" />
+              <stop offset="100%" stop-color="#92400E" />
+            </linearGradient>
+          </defs>
+          <circle
+            cx="24"
+            cy="24"
+            r="22"
+            stroke="url(#tfMobGold)"
+            stroke-width="1.2"
+            stroke-opacity="0.75"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r="19.5"
+            stroke="currentColor"
+            stroke-width="0.5"
+            stroke-opacity="0.25"
+            stroke-dasharray="1.5 2"
+          />
+          <path
+            d="M10 13 H28 V15.5 H25.5 V14.5 H20.5 V35 H23 V36.5 H15 V35 H17.5 V14.5 H12.5 V15.5 H10 Z"
+            fill="currentColor"
+          />
+          <path
+            d="M22 17.5 C25 15.5 32 15 36 17 C35.5 19.5 34 20 33 19 C30.5 18 26.5 18.5 25 20.5 L24 23 H33.5 V25.5 H23 L20 37 H17 L21.5 20 C21.8 19 21.8 18.2 22 17.5 Z"
+            fill="url(#tfMobGold)"
+          />
+          <path
+            d="M21 27 C24 26 30 26 32 28 C30 29.5 25 29 20.5 28.5 Z"
+            fill="url(#tfMobGold)"
+          />
+          <circle cx="36" cy="13" r="1.8" fill="url(#tfMobGold)" />
+        </svg>
+        <span class="name">TEEPHA</span>
+        <span class="sub">FLOWERS & FABRICS</span>
+      </div>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <atelier-theme-toggle />
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Category Filter Rail -->
+  <div class="mobile-categories-rail">
+    <button
+      type="button"
+      class="cat-chip"
+      [class.active]="productStore.categoryFilter() === 'all'"
+      (click)="productStore.setCategoryFilter('all')"
+    >
+      All
+    </button>
+    <button
+      type="button"
+      class="cat-chip"
+      [class.active]="productStore.categoryFilter() === 'fabrics'"
+      (click)="productStore.setCategoryFilter('fabrics')"
+    >
+      Fabrics
+    </button>
+    <button
+      type="button"
+      class="cat-chip"
+      [class.active]="productStore.categoryFilter() === 'accessories'"
+      (click)="productStore.setCategoryFilter('accessories')"
+    >
+      Accessories
+    </button>
+    <button
+      type="button"
+      class="cat-chip"
+      [class.active]="productStore.categoryFilter() === 'sneakers'"
+      (click)="productStore.setCategoryFilter('sneakers')"
+    >
+      Sneakers
+    </button>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingText="Pull for fresh Lagos seed..."
+    ></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Announcement -->
+  <div class="mobile-promo-banner">
+    <span>⚡ Lagos Same-Day Dispatch Active (Cut-off: 1:00 PM)</span>
+  </div>
+
+  <!-- Feed Grid -->
+  <div class="mobile-feed-grid">
+    @for (item of productStore.feedItems(); track item.id) {
+      @if (item.type === 'product' && item.product) {
+        <div class="mobile-grid-item">
+          <atelier-product-card
+            [product]="item.product"
+            [aspectRatio]="item.aspectRatio === '1:1' ? '1 / 1' : '4 / 5'"
+          />
+        </div>
+      } @else if (item.type === 'ai_teaser') {
+        <div class="mobile-grid-item full-width">
+          <div class="m-teaser-card atelier-card">
+            <div class="m-teaser-info">
+              <span class="m-sparkle">✦</span>
+              <div>
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.subtitle }}</p>
+              </div>
+            </div>
+            <a routerLink="/tabs/studio" class="btn-primary mini-btn">
+              Try Preview →
+            </a>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</ion-content>

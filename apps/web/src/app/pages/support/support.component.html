@@ -1,0 +1,220 @@
+<div class="support-container">
+  <div class="support-header">
+    <div class="support-eyebrow-row">
+      <span class="support-eyebrow">⚜ TEEPHA CONCIERGE & CARE ⚜</span>
+      <span class="slogan-badge">"Get a worth for ur class"</span>
+    </div>
+    <h1 class="support-title">
+      Customer Intelligence & Real-Time Support Desk
+    </h1>
+    <p class="support-sub">
+      Instant answers on fabric cuts, Lagos same-day dispatches, Aso-Ebi bridal
+      orders, and direct hand-off to our VIP WhatsApp team.
+    </p>
+
+    <!-- Big WhatsApp Direct Banner -->
+    <div class="top-wa-card atelier-card">
+      <div class="wa-card-left">
+        <span class="wa-circle-icon">💬</span>
+        <div>
+          <strong>Prefer Direct WhatsApp Messaging?</strong>
+          <p>
+            Chat directly with our Lagos Fabric Concierge for high-res bolt
+            videos, swatch reservations, and tailor assignments.
+          </p>
+        </div>
+      </div>
+      <a
+        [href]="supportStore.getWhatsAppUrl()"
+        target="_blank"
+        class="btn-primary wa-hero-btn"
+      >
+        <span>Open WhatsApp Support (+234 800 000 0000) ↗</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="support-layout">
+    <!-- Live AI Concierge Chat -->
+    <div class="chat-card atelier-card">
+      <div class="chat-card-header">
+        <div class="agent-info">
+          <span class="agent-avatar">⚜</span>
+          <div>
+            <strong>Teepha Senior Style Concierge</strong>
+            <span class="status-online">
+              <span class="pulse-dot"></span>
+              Online in Victoria Island · Real-Time Reply Active
+            </span>
+          </div>
+        </div>
+        <a
+          [href]="supportStore.getWhatsAppUrl()"
+          target="_blank"
+          class="btn-secondary wa-escalate-btn"
+        >
+          💬 WhatsApp Concierge ↗
+        </a>
+      </div>
+
+      <!-- Messages Stream Viewport -->
+      <div class="messages-viewport">
+        @for (msg of supportStore.messages(); track msg.id) {
+          <div
+            class="chat-bubble-row"
+            [class.user-row]="msg.sender === 'customer'"
+            [class.admin-row]="msg.sender === 'admin'"
+          >
+            @if (msg.sender !== 'customer') {
+              <span class="bubble-sender-lbl">
+                ⚜
+                {{
+                  msg.sender === 'admin' ? 'SENIOR CONCIERGE' : 'TEEPHA STYLIST'
+                }}
+              </span>
+            }
+            <div
+              class="chat-bubble"
+              [class.user-bubble]="msg.sender === 'customer'"
+              [class.admin-bubble]="msg.sender === 'admin'"
+            >
+              <p class="bubble-text">{{ msg.content }}</p>
+              <span class="bubble-time">{{ msg.timestamp }}</span>
+
+              @if (msg.isWhatsAppHandoff) {
+                <div class="in-bubble-wa-cta">
+                  <a
+                    [href]="supportStore.getWhatsAppUrl(msg.content)"
+                    target="_blank"
+                    class="btn-wa-in-bubble"
+                  >
+                    💬 Continue on WhatsApp with Lagos Concierge ↗
+                  </a>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (supportStore.isTyping()) {
+          <div class="typing-row">
+            <span class="typing-glyph">⚜</span>
+            <span class="typing-text"
+              >Teepha Concierge is reviewing fabric cuts & arrangements...</span
+            >
+          </div>
+        }
+      </div>
+
+      <!-- Suggested Quick Prompts -->
+      <div class="quick-prompts-bar">
+        <button
+          type="button"
+          class="quick-prompt-btn"
+          (click)="
+            supportStore.sendMessage(
+              'How many yards of Senator fabric do I need for a 4-piece Agbada?'
+            )
+          "
+        >
+          ✂ How many yards for Agbada?
+        </button>
+        <button
+          type="button"
+          class="quick-prompt-btn"
+          (click)="
+            supportStore.sendMessage(
+              'Can you deliver to Lekki Phase 1 or Victoria Island before 5 PM today?'
+            )
+          "
+        >
+          ⚡ Lekki same-day delivery?
+        </button>
+        <button
+          type="button"
+          class="quick-prompt-btn"
+          (click)="
+            supportStore.sendMessage(
+              'How can I verify the authenticity of Swiss Voile Lace and St. Gallen threading?'
+            )
+          "
+        >
+          ⚜ Authentic Swiss lace verification?
+        </button>
+        <button
+          type="button"
+          class="quick-prompt-btn"
+          (click)="
+            supportStore.sendMessage(
+              'Do you offer bridal party group discounts for 15+ cuts of Aso-Ebi?'
+            )
+          "
+        >
+          💍 Bridal Aso-Ebi discount?
+        </button>
+      </div>
+
+      <!-- Chat Input Bar -->
+      <div class="chat-input-bar">
+        <input
+          type="text"
+          class="chat-text-input"
+          placeholder="Ask anything about materials, sizing, or Lagos delivery..."
+          [(ngModel)]="inputText"
+          (keyup.enter)="onSendMessage()"
+        />
+        <button
+          type="button"
+          class="btn-primary send-btn"
+          [disabled]="!inputText.trim()"
+          (click)="onSendMessage()"
+        >
+          Send Message →
+        </button>
+      </div>
+    </div>
+
+    <!-- FAQ / Knowledge Base Column -->
+    <div class="faq-column">
+      <h2 class="faq-heading">Frequently Addressed Inquiries</h2>
+
+      <div class="faq-item atelier-card">
+        <h4 class="faq-q">
+          What is the minimum yardage cut for luxury fabrics?
+        </h4>
+        <p class="faq-a">
+          Our master cutters enforce a minimum of 4 yards for Senator fabrics
+          and 5 yards for Swiss Lace to preserve pattern continuity. We cut in
+          0.5-yard increments.
+        </p>
+      </div>
+
+      <div class="faq-item atelier-card">
+        <h4 class="faq-q">How does Lagos Same-Day Dispatch work?</h4>
+        <p class="faq-a">
+          Orders placed before 1:00 PM West Africa Time (WAT) with Lagos
+          delivery addresses are handed directly to our dedicated motorcycle
+          dispatch riders for delivery between 3:30 PM – 5:30 PM.
+        </p>
+      </div>
+
+      <div class="faq-item atelier-card">
+        <h4 class="faq-q">Can I request a verified Master Tailor referral?</h4>
+        <p class="faq-a">
+          Yes. Upon checkout or via our WhatsApp Concierge, patrons can select
+          complimentary referral to accredited Master Tailors located in
+          Victoria Island, Ikoyi, Lekki Phase 1, and Maitama Abuja.
+        </p>
+      </div>
+
+      <div class="faq-item atelier-card">
+        <h4 class="faq-q">What is the "Get a worth for ur class" pledge?</h4>
+        <p class="faq-a">
+          Our founding promise: Every bolt is authenticated under Certificate
+          #ATL-NG-88921-2026, inspected for yarn tension and tropical
+          durability, and backed by a 14-day exchange privilege.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

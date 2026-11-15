@@ -1,0 +1,488 @@
+<div class="account-page-container">
+  <!-- Profile Hero Header -->
+  <header class="account-hero-card atelier-card">
+    <div class="profile-info-row">
+      <div class="avatar-circle">
+        {{ userInitial }}
+      </div>
+      <div class="user-meta">
+        <span class="user-tier-tag"
+          >✦ {{ authStore.loyaltyTier() }} PATRON</span
+        >
+        <h1 class="user-display-name">
+          {{ authStore.currentUser().name || 'Bespoke Patron' }}
+        </h1>
+        <div class="user-contacts">
+          <span>{{ authStore.currentUser().phone }}</span>
+          <span class="dot-sep">·</span>
+          <span>{{
+            authStore.currentUser().email || 'patron@teepha.com'
+          }}</span>
+        </div>
+      </div>
+
+      <div class="profile-stats-group">
+        <div class="stat-cell">
+          <span class="stat-number"
+            >₦{{ (authStore.loyaltyPoints() * 10).toLocaleString() }}</span
+          >
+          <span class="stat-label">Guild Reward Credit</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-number">{{ authStore.tokenBalance() }}</span>
+          <span class="stat-label">AI Studio Tokens</span>
+        </div>
+        <button
+          type="button"
+          class="btn-secondary logout-btn"
+          (click)="onLogout()"
+        >
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="account-tabs-bar">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'deliveries'"
+        (click)="activeTab.set('deliveries')"
+      >
+        <span class="tab-badge">1</span>
+        Active Deliveries & Tracking
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'orders'"
+        (click)="activeTab.set('orders')"
+      >
+        Purchased Products & History
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'history'"
+        (click)="activeTab.set('history')"
+      >
+        Search & View History
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'addresses'"
+        (click)="activeTab.set('addresses')"
+      >
+        Saved Addresses & Tailor Notes
+      </button>
+    </nav>
+  </header>
+
+  <!-- TAB 1: ACTIVE DELIVERIES & LIVE TRACKING -->
+  @if (activeTab() === 'deliveries') {
+    <section class="tab-content-panel">
+      <div class="section-title-wrap">
+        <h2 class="tab-heading">Awaiting Deliveries</h2>
+        <span class="live-status-pill">
+          <span class="pulse-green"></span>
+          Live Tracking (Lagos Same-Day Dispatch)
+        </span>
+      </div>
+
+      @for (order of activeOrders; track order.id) {
+        <div class="active-delivery-card atelier-card">
+          <div class="delivery-header">
+            <div>
+              <span class="order-ref">ORDER {{ order.orderNumber }}</span>
+              <h3 class="delivery-status-headline">{{ order.status }}</h3>
+              <p class="delivery-eta">
+                Estimated Arrival:
+                <strong>{{ order.estimatedDelivery }}</strong>
+              </p>
+            </div>
+            <div class="rider-pill">
+              <span class="rider-icon">🛵</span>
+              <div class="rider-info">
+                <span class="rider-name"
+                  >Priority Courier: {{ order.riderName }}</span
+                >
+                <span class="rider-phone">{{ order.riderPhone }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual Stepper Progress Bar -->
+          <div class="stepper-track">
+            <div
+              class="stepper-step"
+              [class.complete]="order.currentStep >= 1"
+              [class.current]="order.currentStep === 1"
+            >
+              <div class="step-dot">1</div>
+              <span class="step-label">Payment Confirmed</span>
+            </div>
+            <div
+              class="stepper-connector"
+              [class.complete]="order.currentStep >= 2"
+            ></div>
+            <div
+              class="stepper-step"
+              [class.complete]="order.currentStep >= 2"
+              [class.current]="order.currentStep === 2"
+            >
+              <div class="step-dot">2</div>
+              <span class="step-label">Fabric Inspected & Cut</span>
+            </div>
+            <div
+              class="stepper-connector"
+              [class.complete]="order.currentStep >= 3"
+            ></div>
+            <div
+              class="stepper-step"
+              [class.complete]="order.currentStep >= 3"
+              [class.current]="order.currentStep === 3"
+            >
+              <div class="step-dot">3</div>
+              <span class="step-label">Out for Dispatch</span>
+            </div>
+            <div
+              class="stepper-connector"
+              [class.complete]="order.currentStep >= 4"
+            ></div>
+            <div
+              class="stepper-step"
+              [class.complete]="order.currentStep >= 4"
+              [class.current]="order.currentStep === 4"
+            >
+              <div class="step-dot">4</div>
+              <span class="step-label">Delivered to Patron</span>
+            </div>
+          </div>
+
+          <!-- Items in this Delivery -->
+          <div class="delivery-items-list">
+            @for (item of order.items; track item.slug) {
+              <div class="delivery-item-row">
+                <img [src]="item.image" [alt]="item.title" class="item-thumb" />
+                <div class="item-detail">
+                  <a
+                    [routerLink]="['/product', item.slug]"
+                    class="item-title-link"
+                    >{{ item.title }}</a
+                  >
+                  <span class="item-qty"
+                    >{{ item.qtyText }} · ₦{{
+                      item.price.toLocaleString()
+                    }}</span
+                  >
+                </div>
+                <a
+                  [routerLink]="['/product', item.slug]"
+                  class="btn-secondary btn-sm"
+                >
+                  View Fabric Specs →
+                </a>
+              </div>
+            }
+          </div>
+
+          <div class="delivery-footer">
+            <div class="address-note">
+              <span>Delivering to:</span>
+              <strong>{{ order.deliveryAddress }}</strong>
+            </div>
+            <div class="delivery-footer-actions">
+              <button
+                type="button"
+                class="btn-secondary btn-invoice-pill"
+                (click)="openInvoice(order)"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path
+                    d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                  ></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Invoice Receipt
+              </button>
+              <a
+                [href]="
+                  'https://wa.me/2348120008821?text=Tracking%20Order%20' +
+                  order.orderNumber
+                "
+                target="_blank"
+                class="btn-primary"
+              >
+                Message Dispatch on WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- TAB 2: PURCHASED PRODUCTS & ORDER HISTORY -->
+  @if (activeTab() === 'orders') {
+    <section class="tab-content-panel">
+      <div class="section-title-wrap">
+        <h2 class="tab-heading">Purchased Products & Past Orders</h2>
+        <p class="tab-sub">
+          Reorder favorite textiles in one tap or generate official wholesale
+          invoices.
+        </p>
+      </div>
+
+      <div class="orders-history-list">
+        @for (order of pastOrders; track order.id) {
+          <div class="past-order-card atelier-card">
+            <div class="past-order-header">
+              <div>
+                <span class="order-ref"
+                  >ORDER {{ order.orderNumber }} · {{ order.date }}</span
+                >
+                <span class="delivered-badge">✓ DELIVERED</span>
+              </div>
+              <div class="header-right-actions">
+                <span class="order-total-price"
+                  >₦{{ order.total.toLocaleString() }}</span
+                >
+                <button
+                  type="button"
+                  class="btn-secondary btn-invoice-pill"
+                  (click)="openInvoice(order)"
+                  title="Generate Official Wholesale Invoice / PDF Receipt"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path
+                      d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                    ></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  Invoice PDF
+                </button>
+              </div>
+            </div>
+
+            <div class="past-order-items">
+              @for (item of order.items; track item.slug) {
+                <div class="purchased-item-cell">
+                  <img
+                    [src]="item.image"
+                    [alt]="item.title"
+                    class="item-thumb"
+                  />
+                  <div class="item-desc">
+                    <a
+                      [routerLink]="['/product', item.slug]"
+                      class="item-name"
+                      >{{ item.title }}</a
+                    >
+                    <span class="item-meta"
+                      >{{ item.qtyText }} · ₦{{
+                        item.price.toLocaleString()
+                      }}</span
+                    >
+                  </div>
+                  <div class="item-actions">
+                    <a
+                      [routerLink]="['/product', item.slug]"
+                      class="btn-primary btn-sm"
+                    >
+                      Write a Review ★
+                    </a>
+                    <button
+                      type="button"
+                      class="btn-secondary btn-sm"
+                      (click)="reorderItem(item)"
+                    >
+                      Reorder Fabric +
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- TAB 3: SEARCH & VIEW HISTORY -->
+  @if (activeTab() === 'history') {
+    <section class="tab-content-panel">
+      <div class="section-title-wrap">
+        <h2 class="tab-heading">Your Style & Discovery History</h2>
+        <p class="tab-sub">
+          Instant recall of your recent searches and fabrics you explored.
+        </p>
+      </div>
+
+      <!-- Recent Search Queries -->
+      <div class="history-block">
+        <span class="block-title">RECENT SEARCH QUERIES</span>
+        <div class="search-chips-row">
+          @for (query of productStore.searchHistory(); track query) {
+            <button
+              type="button"
+              class="search-chip"
+              (click)="searchAndNavigate(query)"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              {{ query }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Recently Viewed Products -->
+      <div class="history-block">
+        <span class="block-title">RECENTLY VIEWED CURATIONS</span>
+        @if (productStore.recentlyViewedProducts().length > 0) {
+          <div class="recent-products-grid">
+            @for (
+              prod of productStore.recentlyViewedProducts();
+              track prod.id
+            ) {
+              <div class="recent-card atelier-card">
+                <a
+                  [routerLink]="['/product', prod.slug]"
+                  class="recent-media-link"
+                >
+                  <img
+                    [src]="prod.featuredImage"
+                    [alt]="prod.title"
+                    class="recent-img"
+                  />
+                </a>
+                <div class="recent-body">
+                  <span class="recent-brand">{{ prod.brand }}</span>
+                  <a
+                    [routerLink]="['/product', prod.slug]"
+                    class="recent-title"
+                    >{{ prod.title }}</a
+                  >
+                  <span class="recent-price"
+                    >₦{{ prod.price.toLocaleString() }} / {{ prod.unit }}</span
+                  >
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty-note">
+            No recent view history recorded yet. Explore the main feed to
+            discover items.
+          </p>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- TAB 4: SAVED ADDRESSES & TAILOR NOTES -->
+  @if (activeTab() === 'addresses') {
+    <section class="tab-content-panel">
+      <div class="section-title-wrap">
+        <h2 class="tab-heading">Saved Addresses & Tailoring Profile</h2>
+        <p class="tab-sub">
+          Manage priority Lagos/Abuja dispatch addresses and saved custom
+          measurements.
+        </p>
+      </div>
+
+      <div class="address-grid">
+        <div class="address-card atelier-card">
+          <div class="card-top">
+            <span class="default-badge">DEFAULT DISPATCH</span>
+            <button type="button" class="btn-text">Edit</button>
+          </div>
+          <h3 class="addr-name">Boluwatife Farinu</h3>
+          <p class="addr-text">
+            14 Admiralty Way, Lekki Phase 1<br />
+            Eti-Osa LGA, Lagos State<br />
+            Landmark: Opposite Brasas Place
+          </p>
+          <span class="addr-phone">📞 +234 803 987 6543</span>
+        </div>
+
+        <div class="address-card atelier-card">
+          <div class="card-top">
+            <span class="addr-label">ABUJA SUITE</span>
+            <button type="button" class="btn-text">Edit</button>
+          </div>
+          <h3 class="addr-name">Boluwatife Farinu</h3>
+          <p class="addr-text">
+            22 Gana Street, Maitama Diplomatic District<br />
+            Abuja FCT
+          </p>
+          <span class="addr-phone">📞 +234 803 987 6543</span>
+        </div>
+
+        <!-- Tailoring Measurements Card -->
+        <div class="measurements-card atelier-card">
+          <span class="card-kicker">SAVED BESPOKE MEASUREMENTS</span>
+          <h3 class="meas-title">Executive Senator & Agbada Specs</h3>
+          <div class="meas-specs-list">
+            <div class="meas-row">
+              <span>Senator Chest:</span>
+              <strong>42.5 inches</strong>
+            </div>
+            <div class="meas-row">
+              <span>Shoulder Width:</span>
+              <strong>19.0 inches</strong>
+            </div>
+            <div class="meas-row">
+              <span>Shirt Length:</span>
+              <strong>36.0 inches</strong>
+            </div>
+            <div class="meas-row">
+              <span>Trouser Inseam:</span>
+              <strong>32.0 inches</strong>
+            </div>
+            <div class="meas-row">
+              <span>Agbada Wing Span:</span>
+              <strong>62.0 inches</strong>
+            </div>
+          </div>
+          <p class="meas-note">
+            Saved specs are automatically attached when you select "Send to
+            Teepha Master Tailor".
+          </p>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Wholesale Invoice Modal View -->
+  @if (selectedInvoiceOrder(); as invoice) {
+    <atelier-invoice-modal [order]="invoice" (close)="closeInvoice()" />
+  }
+</div>

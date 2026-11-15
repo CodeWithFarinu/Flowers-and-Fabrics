@@ -1,0 +1,126 @@
+<div class="collection-page-container">
+  @if (currentCollection()) {
+    <!-- Collection Hero Banner -->
+    <header class="collection-hero-banner">
+      <div class="hero-bg-layer">
+        <img
+          [src]="currentCollection()!.heroImage"
+          [alt]="currentCollection()!.title"
+          class="banner-img"
+        />
+        <div class="banner-scrim"></div>
+      </div>
+
+      <div class="banner-content">
+        <div class="banner-breadcrumbs">
+          <a routerLink="/" class="crumb-link">Home</a>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-active">Collections</span>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-active">{{ currentCollection()!.title }}</span>
+        </div>
+
+        <span class="curator-badge">CURATED EDIT</span>
+        <h1 class="collection-main-title">
+          {{ currentCollection()!.title }}
+        </h1>
+        <p class="collection-desc">{{ currentCollection()!.subtitle }}</p>
+        <div class="curator-quote">
+          <span class="quote-mark">“</span>
+          <span class="quote-text">{{
+            currentCollection()!.curatorNotes
+          }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filter & Sort Toolbar -->
+    <div class="collection-toolbar">
+      <div class="toolbar-left">
+        <span class="results-count">
+          <strong>{{ filteredProducts().length }}</strong> curated items found
+        </span>
+        <div class="tag-filter-chips">
+          <button
+            type="button"
+            class="tag-chip-btn"
+            [class.active]="selectedTag() === 'all'"
+            (click)="selectedTag.set('all')"
+          >
+            All in Collection
+          </button>
+          @for (tag of availableTags(); track tag) {
+            <button
+              type="button"
+              class="tag-chip-btn"
+              [class.active]="selectedTag() === tag"
+              (click)="selectedTag.set(tag)"
+            >
+              #{{ tag }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <label class="sort-label">
+          <span>Sort:</span>
+          <select
+            class="luxe-sort-select"
+            [value]="sortBy()"
+            (change)="onSortChange($event)"
+          >
+            <option value="featured">Featured Curations</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <!-- True Pinterest Masonry 2-Column Side-by-Side Mobile Grid -->
+    @if (filteredProducts().length > 0) {
+      <div class="pinterest-masonry-grid">
+        @for (product of filteredProducts(); track product.id) {
+          <div class="masonry-item-cell">
+            <atelier-product-card
+              [product]="product"
+              [aspectRatio]="
+                product.aspectRatio === '16:9'
+                  ? '16 / 9'
+                  : product.aspectRatio === '4:3'
+                    ? '4 / 3'
+                    : product.aspectRatio === '1:1'
+                      ? '1 / 1'
+                      : product.aspectRatio === '3:4'
+                        ? '3 / 4'
+                        : product.aspectRatio === '2:3'
+                          ? '2 / 3'
+                          : '4 / 5'
+              "
+            />
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-collection-state atelier-card">
+        <h3>No curations match this specific filter</h3>
+        <p>Try resetting the tag filter to see all items in this edit.</p>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="selectedTag.set('all')"
+        >
+          Reset Filters
+        </button>
+      </div>
+    }
+  } @else {
+    <div class="not-found-state">
+      <h2>Collection Not Found</h2>
+      <p>The curated edit you requested does not exist or has moved.</p>
+      <a routerLink="/" class="btn-primary">Return to Main Feed</a>
+    </div>
+  }
+</div>

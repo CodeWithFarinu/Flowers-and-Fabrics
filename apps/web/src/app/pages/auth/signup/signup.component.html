@@ -1,0 +1,139 @@
+<div class="auth-page-container">
+  <div class="auth-card atelier-card">
+    <div class="auth-header">
+      <span class="auth-kicker">JOIN THE TEEPHA GUILD</span>
+      <h1 class="auth-title">Become a Registered Patron</h1>
+      <p class="auth-subtitle">
+        Includes 3 complimentary AI Style Studio tokens, same-day Lagos dispatch
+        tracking, and access to private fabric drops.
+      </p>
+    </div>
+
+    <form (submit)="onSignup($event)" class="auth-form">
+      <div class="form-group">
+        <label for="fullName">Full Name *</label>
+        <input
+          id="fullName"
+          type="text"
+          [(ngModel)]="name"
+          name="name"
+          required
+          placeholder="e.g. Chief Adewale Adeleke"
+          class="luxe-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="phone"
+          >WhatsApp Phone Number * (Required for Delivery)</label
+        >
+        <input
+          id="phone"
+          type="tel"
+          [(ngModel)]="phone"
+          name="phone"
+          required
+          placeholder="e.g. +234 803 987 6543"
+          class="luxe-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          placeholder="patron@domain.com"
+          class="luxe-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="city">Delivery City / State</label>
+        <select id="city" [(ngModel)]="city" name="city" class="luxe-input">
+          <option value="Lagos (Victoria Island / Ikoyi)">
+            Lagos (Victoria Island / Ikoyi)
+          </option>
+          <option value="Lagos (Lekki / Ajah)">Lagos (Lekki / Ajah)</option>
+          <option value="Lagos (Mainland / Ikeja)">
+            Lagos (Mainland / Ikeja)
+          </option>
+          <option value="Abuja (Maitama / Asokoro)">
+            Abuja (Maitama / Asokoro)
+          </option>
+          <option value="Port Harcourt (Rivers)">Port Harcourt (Rivers)</option>
+          <option value="Other Nigerian City">Other Nigerian City</option>
+        </select>
+      </div>
+
+      <div class="perk-banner">
+        <span class="sparkle">✦</span>
+        <span
+          ><strong>3 Free AI Style Tokens</strong> will be credited to your
+          account immediately.</span
+        >
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary full-btn"
+        [disabled]="isLoading()"
+      >
+        {{
+          isLoading() ? 'Creating Patron Account...' : 'Create Patron Account →'
+        }}
+      </button>
+    </form>
+
+    <div
+      class="divider-row"
+      style="margin: 20px 0; display: flex; align-items: center; gap: 12px"
+    >
+      <span
+        style="flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1)"
+      ></span>
+      <span
+        style="
+          font-size: 11px;
+          letter-spacing: 0.1em;
+          color: rgba(255, 255, 255, 0.5);
+        "
+        >OR SIGN UP WITH</span
+      >
+      <span
+        style="flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1)"
+      ></span>
+    </div>
+
+    <button
+      type="button"
+      class="btn-secondary social-btn"
+      style="
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px;
+        margin-bottom: 16px;
+      "
+      (click)="onGoogleSignup()"
+      [disabled]="isLoading()"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+        />
+      </svg>
+      Sign Up with Google
+    </button>
+
+    <div class="auth-footer">
+      <span>Already have an account?</span>
+      <a routerLink="/login" class="login-link">Sign In to Your Vault →</a>
+    </div>
+  </div>
+</div>
