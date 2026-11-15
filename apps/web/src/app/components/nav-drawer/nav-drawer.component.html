@@ -77,9 +77,7 @@
       @if (authStore.currentUser(); as user) {
         <div class="user-info">
           <span class="user-greeting">Welcome back,</span>
-          <strong class="user-name">{{
-            user.name || 'Bespoke Customer'
-          }}</strong>
+          <strong class="user-name">{{ user.name || 'Bespoke Customer' }}</strong>
           <div class="user-tier-pill">
             <span class="tier-sparkle">✦</span>
             {{ user.loyaltyTier }} Member · {{ user.loyaltyPoints }} Pts
@@ -191,10 +189,7 @@
           </svg>
           <span>VIP Drop Alerts</span>
         </div>
-        <span
-          class="action-pill-tag"
-          [class.gold-tag]="pushService.isSubscribed()"
-        >
+        <span class="action-pill-tag" [class.gold-tag]="pushService.isSubscribed()">
           {{ pushService.isSubscribed() ? 'ON ✓' : 'ENABLE' }}
         </span>
       </button>
