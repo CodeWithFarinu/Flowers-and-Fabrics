@@ -1,0 +1,205 @@
+/**
+ * Monochrome Luxe Design System Tokens
+ * Strictly Black & White foundation with surgical accents.
+ */
+
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-elevated: #f9f9f9;
+  --surface: #f4f4f4;
+  --surface-hover: #ececec;
+  --surface-strong: #e5e5e5;
+  --border: #e5e5e5;
+  --border-subtle: #eeeeee;
+  --border-focus: #000000;
+
+  --text: #0a0a0a;
+  --text-muted: #666666;
+  --text-subtle: #999999;
+
+  --inverse-bg: #000000;
+  --inverse-text: #ffffff;
+  --inverse-hover: #1a1a1a;
+
+  /* Surgical Accents (used sparingly) */
+  --accent-emerald: #059669;
+  --accent-gold: #d97706;
+  --accent-blue: #2563eb;
+  --status-danger: #dc2626;
+  --status-warning: #d97706;
+  --status-success: #059669;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+  --radius-full: 9999px;
+
+  /* Shadows & Elevation */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.1);
+  --hairline: 1px solid var(--border);
+
+  /* Fonts */
+  --font-sans:
+    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Geist', 'Inter',
+    'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Playfair Display', 'Fraunces', Georgia, serif;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #000000;
+  --bg-elevated: #0c0c0c;
+  --surface: #141414;
+  --surface-hover: #1f1f1f;
+  --surface-strong: #242424;
+  --border: #222222;
+  --border-subtle: #191919;
+  --border-focus: #ffffff;
+
+  --text: #f5f5f5;
+  --text-muted: #a3a3a3;
+  --text-subtle: #666666;
+
+  --inverse-bg: #ffffff;
+  --inverse-text: #000000;
+  --inverse-hover: #e5e5e5;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.8);
+  --hairline: 1px solid var(--border);
+}
+
+/* Base Body Styles */
+html,
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  transition:
+    background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular Numerals for Currency (Naira ₦) */
+.num-tabular,
+.price-display {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Luxury Card Styles */
+.atelier-card {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.atelier-card:hover {
+  border-color: var(--border-focus);
+}
+
+/* Luxury Button Styles */
+.btn-primary {
+  background-color: var(--inverse-bg);
+  color: var(--inverse-text);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  padding: 10px 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  text-decoration: none;
+  font-size: 0.925rem;
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  text-decoration: none;
+  font-size: 0.925rem;
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--text);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.btn-ghost:hover {
+  background-color: var(--surface);
+}
+
+/* Glass / Frosted Header */
+.glass-header {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(var(--bg), 0.85);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
